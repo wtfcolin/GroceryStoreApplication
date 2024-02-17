@@ -31,7 +31,7 @@ public class Program {
             int lineCount = GetLineCount(path);
             List<Food> inventory = new();
             
-            for (int i = 3; i < lineCount - 1; i++) {
+            for (int i = 3; i < lineCount; i++) {
                 string line = reader.ReadLine();
                 string[] cols = line.Split(',');
                 string name = cols[0];
@@ -59,7 +59,9 @@ public class Program {
         string path = "Store.csv"; // Path to the file that contains 'Food' object properties in a CSV format.
 
         List<Food> cart = new();
-        User user = new User(21, 100.0, cart, false);
+        List<Food> groceryList = new();
+
+        User user = new User(21, 100.0, cart, false, groceryList);
         Store store = LoadStore(path);
 
         ClearTerminal();

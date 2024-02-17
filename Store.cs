@@ -18,11 +18,11 @@ public class Store {
     }
 
     public override string ToString() {
-        return $"Store Name: {storeName}\n{Inventory}";
+        return $"---[ Store Information ]---\nName: {StoreName}\nBalance: {Balance:$#,##0.00}";
     }
 
     // If the user wants to view all the avaliable foods
-    public void ListFoods() {
+    public void ViewStore() {
         List<string> categories = new();
         Console.WriteLine("===============[ Store Inventory ]================");
 

@@ -6,13 +6,18 @@ public class User {
     private int age;
     private double balance;
     private List<Food> cart;
-    // private List<Food> list;
+    private List<Food> groceryList;
 
-    public User(int age, double balance, List<Food> cart, bool admin) {
+    public User(int age, double balance, List<Food> cart, bool admin, List<Food> groceryList) {
         Age = age;
         Balance = balance;
         Cart = cart;
-        this.admin = admin;
+        Admin = admin;
+        GroceryList = groceryList;
+    }
+
+    public override string ToString() {
+        return $"---[ User Information ]---\nAge: {Age}\nBalance: {Balance:$#,##0.00}\nAdmin: {Admin}";
     }
 
     public void ViewCart() {
@@ -22,9 +27,9 @@ public class User {
         if (Cart.Count == 0) {
             Console.WriteLine("There are currently 0 items in your cart...");
         } else {
-            foreach (var food in Cart) {
+            foreach (var cartItem in Cart) {
                 counter++;
-                Console.WriteLine($"{counter}) {food.Quantity} {food.Name} [{food.Quantity * food.Price:$#,##0.00}]");
+                Console.WriteLine($"{counter}) {cartItem.Quantity} {cartItem.Name} [{cartItem.Quantity * cartItem.Price:$#,##0.00}]");
             }
         }
 
@@ -32,18 +37,22 @@ public class User {
         return;
     }
 
-    public void CheckList() {
+    public void ViewList() {
         Console.WriteLine("==============[ Your Grocery List ]===============");
 
-        //for (int i = 0; i < list.Length; i++) {
-        //    Console.WriteLine($"[{}] {}");
-        //}
+        if (GroceryList.Count == 0) {
+            Console.WriteLine("There are currently 0 items on your grocery list...");
+        } else {
+            foreach (var listItem in GroceryList) {
+                Console.WriteLine($"- {listItem.Quantity} {listItem.Name}");
+            }
+        }
 
         Console.WriteLine("==================================================");
         return;
     }
 
-    public void AddItem(string item, int amount, Store store) {
+    public void AddItem(string item, int amount, Store store, int userAge) {
         bool check = true;
 
         foreach (var storeItem in store.Inventory) {
@@ -51,6 +60,11 @@ public class User {
             if (item.ToLower() == storeItem.Name.ToLower() && storeItem.Quantity > 0) {
                 // For each food in inventory, check if the amount that was requested is less than the current stock
                 check = false;
+                if (userAge < 21 && storeItem.Category == "Alcohol") {
+                    Console.WriteLine("[!] This store does not sell alcohol to people younger than 21!");
+                    return;
+                }
+
                 if (storeItem.Quantity - amount >= 0) {
                     if (Cart.Count > 0) {
                         foreach (var cartItem in Cart) {
@@ -67,13 +81,15 @@ public class User {
                         storeItem.Quantity -= amount;
                         Cart.Add(newItem);
                     }
+                    // Tell the user that the item was added to their cart
                     Console.WriteLine($"{amount} {storeItem.Name} was added to your cart!");
                 } else {
+                    // If the amount is more than the store's quantity, give an error
                     Console.WriteLine($"[!] There is not enough '{item}' in stock!");
                 }
             }
         }
-
+        // If there are no matching items in the store or if there is 0 stock, give an error
         if (check) {
             Console.WriteLine($"[!] This store does not have any '{item}'!");
         }
@@ -91,6 +107,7 @@ public class User {
                 foreach (var storeItem in store.Inventory) {
                     // For each item in the store inventory, if item matches & current cart quantity is either = or > 0, then proceed with transaction
                     if (storeItem.Name.ToLower() == item.ToLower()) {
+                        // If the amount being removed is = or > 0, remove the items from cart and add to store inventory
                         if (cartItem.Quantity - amount == 0) {
                             Cart.Remove(cartItem);
                             storeItem.Quantity += amount;
@@ -99,6 +116,7 @@ public class User {
                             cartItem.Quantity -= amount;
                             storeItem.Quantity += amount;
                             Console.WriteLine($"{amount} {storeItem.Name} was removed from your cart!");
+                        // If the amount is more than what is in the cart, give an error
                         } else {
                             Console.WriteLine($"[!] You do not have that many '{item}' in your cart!");
                         }
@@ -148,6 +166,13 @@ public class User {
         get => cart;
         set {
             cart = value;
+        }
+    }
+
+    public List<Food> GroceryList {
+        get => groceryList;
+        set {
+            groceryList = value;
         }
     }
 

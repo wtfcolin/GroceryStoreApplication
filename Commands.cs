@@ -8,7 +8,7 @@ public static class Commands {
             return true;
 
             case "add":
-            user.AddItem(arguments[1], int.Parse(arguments[2]), store);
+            user.AddItem(arguments[1], int.Parse(arguments[2]), store, user.Age);
             return true;
 
             case "remove":
@@ -24,10 +24,11 @@ public static class Commands {
             return true;
 
             case "look":
-            store.ListFoods();
+            store.ViewStore();
             return true;
 
             case "list":
+            user.ViewList();
             return true;
 
             case "clear":
@@ -41,7 +42,19 @@ public static class Commands {
             return false;
 
             case "admin123":
-            user.Admin = true;
+            if (user.Admin) {
+                user.Admin = false;
+            } else {
+                user.Admin = true;
+            }
+            return true;
+
+            case "me":
+            Console.WriteLine(user);
+            return true;
+
+            case "store":
+            Console.WriteLine(store);
             return true;
 
             case "home":
@@ -64,6 +77,8 @@ public static class Commands {
         Console.WriteLine("- checkout = Prints a receipt of your items if all the conditions are satisfied");
         Console.WriteLine("- look = Lists all the items that the store has an their quantity");
         Console.WriteLine("- list = Prints out your grocery list");
+        Console.WriteLine("- store = Prints out information about the current store");
+        Console.WriteLine("- me = Prints out information about the current user");
 
         if (ADMIN) {
             Console.WriteLine("\n- set age [age] = Sets the age of the current user (ADMIN)");
