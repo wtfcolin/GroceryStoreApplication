@@ -24,7 +24,7 @@ public class User {
         } else {
             foreach (var food in Cart) {
                 counter++;
-                Console.WriteLine($"{counter}) {food.Quantity} {food.Name} [{(food.Quantity * food.Price).ToString("$#,##0.00")}]");
+                Console.WriteLine($"{counter}) {food.Quantity} {food.Name} [{food.Quantity * food.Price:$#,##0.00}]");
             }
         }
 
@@ -44,8 +44,8 @@ public class User {
     }
 
     public void AddItem(string item, int amount, Store store) {
-        bool check = true; 
-        
+        bool check = true;
+
         foreach (var storeItem in store.Inventory) {
             // For each food in inventory, check if the store has the item and its not out of stock
             if (item.ToLower() == storeItem.Name.ToLower() && storeItem.Quantity > 0) {
@@ -59,20 +59,18 @@ public class User {
                                 // Add 1 to quantity to existing item
                                 cartItem.Quantity += amount;
                                 storeItem.Quantity -= amount;
-                                Console.WriteLine("First line");
                             }
-                            // Decrement 1 to the quantity of the item in the store.
                         }
                     } else {
                         // Create a new food object and set the quantity to 1 while copying the other properties from the store
                         Food newItem = new(storeItem.Name, amount, storeItem.Category, storeItem.Price, storeItem.Calories);
                         storeItem.Quantity -= amount;
                         Cart.Add(newItem);
-                        Console.WriteLine("Second line");
                     }
+                    Console.WriteLine($"{amount} {storeItem.Name} was added to your cart!");
                 } else {
                     Console.WriteLine($"[!] There is not enough '{item}' in stock!");
-                } 
+                }
             }
         }
 
@@ -84,9 +82,35 @@ public class User {
     }
 
     public void RemoveItem(string item, int amount, Store store) {
-        foreach (var cartItem in Cart) {
+        bool check = true;
 
+        foreach (var cartItem in Cart) {
+            // For each item in the cart, find item with matching name and quantity is greater than 0
+            if (item.ToLower() == cartItem.Name.ToLower() && cartItem.Quantity > 0) {
+                check = false;
+                foreach (var storeItem in store.Inventory) {
+                    // For each item in the store inventory, if item matches & current cart quantity is either = or > 0, then proceed with transaction
+                    if (storeItem.Name.ToLower() == item.ToLower()) {
+                        if (cartItem.Quantity - amount == 0) {
+                            Cart.Remove(cartItem);
+                            storeItem.Quantity += amount;
+                            Console.WriteLine($"{amount} {storeItem.Name} was removed from your cart!");
+                        } else if (cartItem.Quantity - amount > 0) {
+                            cartItem.Quantity -= amount;
+                            storeItem.Quantity += amount;
+                            Console.WriteLine($"{amount} {storeItem.Name} was removed from your cart!");
+                        } else {
+                            Console.WriteLine($"[!] You do not have that many '{item}' in your cart!");
+                        }
+                    }
+                }
+            }
         }
+
+        if (check) {
+            Console.WriteLine($"[!] There is currently no '{item}' in your cart!");
+        }
+
         return;
     }
 
