@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 public class User {
+    private string name;
     private bool admin;
     private int age;
     private double balance;
     private List<Food> cart;
     private List<Food> groceryList;
 
-    public User(int age, double balance, List<Food> cart, bool admin, List<Food> groceryList) {
+    public User(string name, int age, double balance, List<Food> cart, bool admin, List<Food> groceryList) {
+        Name = name;
         Age = age;
         Balance = balance;
         Cart = cart;
@@ -130,6 +133,13 @@ public class User {
         }
 
         return;
+    }
+
+    public string Name {
+        get => name;
+        set {
+            name = value;
+        }
     }
 
     public int Age {

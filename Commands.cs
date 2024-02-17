@@ -4,7 +4,11 @@ public static class Commands {
     public static bool Command(string[] arguments, User user, Store store) {
         switch (arguments[0]) {
             case "set":
-            SetValue(arguments[1], double.Parse(arguments[2]), user, store);
+            if (arguments[1] == "name") {
+                SetValue(arguments[1], arguments[2], user, store);
+            } else {
+                SetValue(arguments[1], double.Parse(arguments[2]), user, store);
+            }
             return true;
 
             case "add":
@@ -36,7 +40,8 @@ public static class Commands {
             return true;
 
             case "checkout":
-            return true;
+            store.CheckOut(user);
+            return false;
 
             case "exit":
             return false;
@@ -58,7 +63,7 @@ public static class Commands {
             return true;
 
             case "home":
-            store.Greeting(user.Balance, user.Age, store.StoreName, user.Cart.Count);
+            store.Greeting(user.Name, user.Balance, user.Age, user.Cart.Count);
             return true;
 
             default:
@@ -115,13 +120,32 @@ public static class Commands {
         }
     }
 
+    public static void SetValue(string option, string value, User user, Store store) {
+        if (string.IsNullOrEmpty(option)) {
+            Console.WriteLine("[!] Invalid option! Please provide a valid option.");
+            return;
+        } else if (value.GetType() != typeof(double)) {
+            Console.WriteLine("[!] Invalid amount! Please provide a valid amount.");
+            return;
+        }
+
+        if (user.Admin == true) {
+            if (option == "name") {
+                user.Name = value;
+            } 
+        } else {
+            Console.WriteLine("[!] You do not have proper permissions to access this command!");
+            return;
+        }
+    }
+
     public static void ClearTerminal() {
         for (int i = 0; i < 50; i++) {
             Console.WriteLine("\n");
         }
     }
 
-    public static bool CommandLine (bool ADMIN, User user, Store store) {
+    public static bool CommandLine (User user, Store store) {
         Console.WriteLine("\n--------------------------------------------------");
         Console.Write(">> ");
         string command = Console.ReadLine(); // Get the user input

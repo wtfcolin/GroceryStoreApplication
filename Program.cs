@@ -24,6 +24,7 @@ public class Program {
         try {
             using StreamReader reader = new StreamReader(path);
             string storeName = reader.ReadLine(); // Name of the store in the CSV file.
+            string storeAddress = reader.ReadLine(); // Address of the store in the CSV file.
             double storeBalance = double.Parse(reader.ReadLine()); // Balance of the store in the CSV file.
             
             reader.ReadLine(); // Skip over the header
@@ -31,7 +32,8 @@ public class Program {
             int lineCount = GetLineCount(path);
             List<Food> inventory = new();
             
-            for (int i = 3; i < lineCount; i++) {
+            // For each of the lines past the store information, collect each part of information that creates the food objects and assigns them to a list
+            for (int i = 4; i < lineCount; i++) {
                 string line = reader.ReadLine();
                 string[] cols = line.Split(',');
                 string name = cols[0];
@@ -44,7 +46,7 @@ public class Program {
                 inventory.Add(item);
             }
 
-            Store store = new Store(storeName, storeBalance, inventory);
+            Store store = new Store(storeName, storeAddress, storeBalance, 0.15, inventory);
             return store;
         } catch {
             Console.WriteLine("[!] Loading food items was unsuccessful, check the syntax of the CSV file!");
@@ -55,20 +57,35 @@ public class Program {
 
     private static void Main() {
         bool RUNNING = true; // Status of the program. Once it toggles false the program ends.
-        bool ADMIN = false; // Toggle for administration priviledges.
         string path = "Store.csv"; // Path to the file that contains 'Food' object properties in a CSV format.
 
         List<Food> cart = new();
         List<Food> groceryList = new();
 
-        User user = new User(21, 100.0, cart, false, groceryList);
+        ClearTerminal();
+        Console.WriteLine("What is your name?");
+        Console.Write(">> ");
+        string name = Console.ReadLine();
+        Console.WriteLine("How old are you?");
+        Console.Write(">> ");
+        int age = int.Parse(Console.ReadLine());
+        Console.WriteLine("How much money do you want? (0.00 format)");
+        Console.Write(">> ");
+        double balance = double.Parse(Console.ReadLine());
+
+        //string name2 = "Colin Monthie";
+        //int age2 = 21;
+        //double balance2 = 300.0;
+        //User user2 = new User(name2, age2, balance2, cart, false, groceryList);
+
+        User user = new User(name, age, balance, cart, false, groceryList);
         Store store = LoadStore(path);
 
         ClearTerminal();
-        store.Greeting(user.Balance, user.Age, store.StoreName, user.Cart.Count);
+        store.Greeting(user.Name, user.Balance, user.Age, user.Cart.Count);
 
         while (RUNNING) {
-            RUNNING = CommandLine(ADMIN, user, store);
+            RUNNING = CommandLine(user, store);
         }
     }
 }
