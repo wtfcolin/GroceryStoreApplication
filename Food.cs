@@ -7,6 +7,14 @@ public class Food {
     private double price; // Price for the food item (per 1)
     private int calories; // Calories for the food item (per 1)
 
+    /*
+     * Constructor for the 'Food' object
+     * - name (string): Name of the food
+     * - quantity (int): Amount of the food
+     * - category (string): Type of food that object belongs to
+     * - price (double): Price per item 
+     * - calories (int): Claories per item
+     */
     public Food(string name, int quantity, string category, double price, int calories) {
         Name = name;
         Quantity = quantity;
@@ -15,6 +23,7 @@ public class Food {
         Calories = calories;
     }
 
+    // Override function that shows information about the food object
     public override string ToString() {
         return $"- {Name} ({Quantity})\t\t| Price: {Price:$#,##0.00}\t\t| Category: {Category}\t\t| Calories: {Calories}";
     }

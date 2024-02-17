@@ -73,18 +73,13 @@ public class Program {
         Console.Write(">> ");
         double balance = double.Parse(Console.ReadLine());
 
-        //string name2 = "Colin Monthie";
-        //int age2 = 21;
-        //double balance2 = 300.0;
-        //User user2 = new User(name2, age2, balance2, cart, false, groceryList);
-
         User user = new User(name, age, balance, cart, false, groceryList);
         Store store = LoadStore(path);
 
         ClearTerminal();
-        store.Greeting(user.Name, user.Balance, user.Age, user.Cart.Count);
+        store.Greeting(user.Name, user.UserBalance, user.Age, user.Cart);
 
-        while (RUNNING) {
+        while (RUNNING) { 
             RUNNING = CommandLine(user, store);
         }
     }

@@ -27,8 +27,20 @@ public static class Commands {
             user.ViewCart();
             return true;
 
-            case "look":
+            case "options":
             store.ViewStore();
+            return true;
+
+            case "balance":
+            Console.WriteLine(user.UserBalance);
+            return true;
+
+            case "bal":
+            Console.WriteLine(user.UserBalance);
+            return true;
+
+            case "search":
+            // Search function
             return true;
 
             case "list":
@@ -63,7 +75,7 @@ public static class Commands {
             return true;
 
             case "home":
-            store.Greeting(user.Name, user.Balance, user.Age, user.Cart.Count);
+            store.Greeting(user.Name, user.UserBalance, user.Age, user.Cart);
             return true;
 
             default:
@@ -80,8 +92,9 @@ public static class Commands {
         Console.WriteLine("- remove [item] [amount] = Removes a food item from your cart");
         Console.WriteLine("- cart = Lists all the items that are in your cart currently");
         Console.WriteLine("- checkout = Prints a receipt of your items if all the conditions are satisfied");
-        Console.WriteLine("- look = Lists all the items that the store has an their quantity");
+        Console.WriteLine("- options = Lists all the items that the store has and their quantity");
         Console.WriteLine("- list = Prints out your grocery list");
+        Console.WriteLine("- balance; bal = Prints out your balance");
         Console.WriteLine("- store = Prints out information about the current store");
         Console.WriteLine("- me = Prints out information about the current user");
 
@@ -110,9 +123,9 @@ public static class Commands {
             if (option == "age") {
                 user.Age = (int)amount;
             } else if (option == "balance") {
-                user.Balance = amount;
+                user.UserBalance = amount;
             } else if (option == "storebalance") {
-                store.Balance = amount;
+                store.StoreBalance = amount;
             }
         } else {
             Console.WriteLine("[!] You do not have proper permissions to access this command!");
@@ -140,7 +153,7 @@ public static class Commands {
     }
 
     public static void ClearTerminal() {
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 30; i++) {
             Console.WriteLine("\n");
         }
     }
@@ -151,6 +164,8 @@ public static class Commands {
         string command = Console.ReadLine(); // Get the user input
         string[] arguments = command.Split(' '); // Split the input by spaces to get the arguments
         Console.WriteLine("--------------------------------------------------");
+
+        ClearTerminal();
 
         return Command(arguments, user, store);
     } 
