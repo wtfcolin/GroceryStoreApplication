@@ -16,7 +16,7 @@ public class Food {
     }
 
     public override string ToString() {
-        return $"===[ {Name} ]===\nCategory: {Category}\nCalories: {Calories}\n\nPrice: ${Price}\n({Quantity}) in stock";
+        return $"- {Name} ({Quantity})\t\t| Price: {Price:$#,##0.00}\t\t| Category: {Category}\t\t| Calories: {Calories}";
     }
 
     public string Name {
@@ -26,9 +26,9 @@ public class Food {
             if (string.IsNullOrWhiteSpace(value)) {
                 Console.WriteLine("[!] Invalid Name! Name was set to 'PLACEHOLDER' instead.");
                 name = "NONE";
-            } else {
-                name = value;
             }
+            
+            name = value;
         }
     }
 
@@ -43,9 +43,9 @@ public class Food {
             } else if (value < 0) {
                 Console.WriteLine("[!] There can't be less than 0 items! Quantity was set to '0' instead.");
                 quantity = 0;
-            } else {
-                quantity = value;
             }
+            
+            quantity = value;
         }
     }
 
@@ -54,10 +54,11 @@ public class Food {
         set {
             // Set the category to NONE if the input is empty/null
             if (string.IsNullOrWhiteSpace(value)) {
-                Console.WriteLine("[!] Invalid Category! Category was set to '");
-            } else {
-                category = value;
+                Console.WriteLine("[!] Invalid Category! Category was set to 'NONE' instead.");
+                category = "NONE";
             }
+            
+            category = value;
         }
     }
 
@@ -72,9 +73,9 @@ public class Food {
             } else if (value < 0.0) {
                 Console.WriteLine("[!] The price can't be less than $0! Price was set to '0.0' instead.");
                 price = 0.0;
-            } else {
-                price = value;
             }
+            
+            price = value;
         }
     }
 
@@ -86,10 +87,11 @@ public class Food {
                 Console.WriteLine("[!] Invalid Calories! Calories was set to '0' instead.");
                 calories = 0;
             } else if (value < 0) {
-                calories = value;
-            } else {
-                calories = value;
+                Console.WriteLine("[!] The calories can't be less than 0! Calories was set to '0' instead.");
+                calories = 0;
             }
+            
+            calories = value;
         }
     }
 }

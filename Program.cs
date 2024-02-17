@@ -1,33 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using static Commands;
 
 public class Program {
-    private static bool Command(string[] arguments, bool ADMIN) {
-        // -- Exception Handling --
-        if (arguments[0].Length == 0) {
-            Console.WriteLine("[!] Invalid Command! Try using 'help' for a list of commands.");
-            return true;
-        }
-        // -- Admin Commands --
-        // If there are no arguments in the input, encourage the user to look for commands
-
-        // If the argument is 'exit', end the program by toggling returning false
-        if (arguments[0].ToLower() == "exit") {
-            return false;
-        } else if (arguments[0].ToLower() == "help") {
-            Console.WriteLine("===[ List Of Commands ]===");
-            Console.WriteLine("- help = Displays a list of commands");
-            Console.WriteLine("- exit = Exits the program");
-            Console.WriteLine("- view store = Lists all the items that the store has an their quantity");
-            return true;
-        }
-
-        // If the arguments did not match any of the conditions, go back to input prompt
-        Console.WriteLine("[!] Invalid Command! Try using 'help' for a list of commands.");
-        return true;
-    }
-
     private static int GetLineCount(string path) {
         if (!File.Exists(path)) {
             Console.WriteLine($"[!] Count not read file '{path}'!");
@@ -44,41 +20,53 @@ public class Program {
         return count;
     }
 
+    private static Store LoadStore(string path) {
+        try {
+            using StreamReader reader = new StreamReader(path);
+            string storeName = reader.ReadLine(); // Name of the store in the CSV file.
+            double storeBalance = double.Parse(reader.ReadLine()); // Balance of the store in the CSV file.
+            
+            reader.ReadLine(); // Skip over the header
+
+            int lineCount = GetLineCount(path);
+            List<Food> inventory = new();
+            
+            for (int i = 3; i < lineCount - 1; i++) {
+                string line = reader.ReadLine();
+                string[] cols = line.Split(',');
+                string name = cols[0];
+                int quantity = int.Parse(cols[1]);
+                string category = cols[2];
+                double price = double.Parse(cols[3]);
+                int calories = int.Parse(cols[4]);
+
+                Food item = new Food(name, quantity, category, price, calories);
+                inventory.Add(item);
+            }
+
+            Store store = new Store(storeName, storeBalance, inventory);
+            return store;
+        } catch {
+            Console.WriteLine("[!] Loading food items was unsuccessful, check the syntax of the CSV file!");
+            Store store = new Store("NONE", 0);
+            return store;
+        }
+    }
+
     private static void Main() {
         bool RUNNING = true; // Status of the program. Once it toggles false the program ends.
         bool ADMIN = false; // Toggle for administration priviledges.
-        double balance = 1000.00; // Current balance for the user (set to any double).
-        int age = 18; // Current age for the user (set to any int)
-        string path = "Store.csv";
+        string path = "Store.csv"; // Path to the file that contains 'Food' object properties in a CSV format.
 
-        var cart = new List<Food>();
-        Store store = new Store();
+        List<Food> cart = new();
+        User user = new User(21, 100.0, cart, false);
+        Store store = LoadStore(path);
 
-        if (!File.Exists(path)) {
-            Console.WriteLine("[!] Could not load store correctly!");
-            return;
-        } else {
-            Console.WriteLine("{GSA} >> Store has successfully loaded!");
-        }
-
-        int lineCount = GetLineCount(path);
-
-        Console.WriteLine("============================");
-        Console.WriteLine("Grocery Shopping Application");
-        Console.WriteLine("----------------------------");
-        Console.WriteLine($"> Balance: ${balance}");
-        Console.WriteLine($"> Age: {age}\n");
-        Console.WriteLine($"> Items in cart: {cart.Count}");
-        Console.WriteLine("============================");
+        ClearTerminal();
+        store.Greeting(user.Balance, user.Age, store.StoreName, user.Cart.Count);
 
         while (RUNNING) {
-            Console.WriteLine("\n----------------------------");
-            Console.Write(">> ");
-            string command = Console.ReadLine(); // Get the user input
-            string[] arguments = command.Split(' '); // Split the input by spaces to get the arguments
-
-            Console.WriteLine("----------------------------");
-            RUNNING = Command(arguments, ADMIN);
+            RUNNING = CommandLine(ADMIN, user, store);
         }
     }
 }
