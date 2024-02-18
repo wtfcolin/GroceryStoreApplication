@@ -4,6 +4,7 @@ using System.IO;
 using static Commands;
 
 public class Program {
+    // Function that gets the line count of a file located in path
     private static int GetLineCount(string path) {
         if (!File.Exists(path)) {
             Console.WriteLine($"[!] Count not read file '{path}'!");
@@ -19,7 +20,7 @@ public class Program {
 
         return count;
     }
-
+    // Function that loads a store from 'Store.csv'
     private static Store LoadStore(string path) {
         try {
             using StreamReader reader = new StreamReader(path);
@@ -30,9 +31,9 @@ public class Program {
             reader.ReadLine(); // Skip over the header
 
             int lineCount = GetLineCount(path);
-            List<Food> inventory = new();
+            List<Item> inventory = new();
             
-            // For each of the lines past the store information, collect each part of information that creates the food objects and assigns them to a list
+            // For each of the lines past the store information, collect each part of information that creates the item and assigns them to a list
             for (int i = 4; i < lineCount; i++) {
                 string line = reader.ReadLine();
                 string[] cols = line.Split(',');
@@ -42,26 +43,28 @@ public class Program {
                 double price = double.Parse(cols[3]);
                 int calories = int.Parse(cols[4]);
 
-                Food item = new Food(name, quantity, category, price, calories);
+                Item item = new Item(name, quantity, category, price, calories);
                 inventory.Add(item);
             }
 
             Store store = new Store(storeName, storeAddress, storeBalance, 0.15, inventory);
             return store;
         } catch {
-            Console.WriteLine("[!] Loading food items was unsuccessful, check the syntax of the CSV file!");
+            Console.WriteLine("[!] Loading items was unsuccessful, check the syntax of the CSV file!");
             Store store = new Store("NONE", 0);
             return store;
         }
     }
-
+    // Main function
     private static void Main() {
         bool RUNNING = true; // Status of the program. Once it toggles false the program ends.
         string path = "Store.csv"; // Path to the file that contains 'Food' object properties in a CSV format.
 
-        List<Food> cart = new();
-        List<Food> groceryList = new();
+        List<Item> cart = new();
+        List<Item> groceryList = new();
 
+        // Prompt the user before the program starts to enter personal information
+        /*
         ClearTerminal();
         Console.WriteLine("What is your name?");
         Console.Write(">> ");
@@ -72,8 +75,10 @@ public class Program {
         Console.WriteLine("How much money do you want? (0.00 format)");
         Console.Write(">> ");
         double balance = double.Parse(Console.ReadLine());
-
         User user = new User(name, age, balance, cart, false, groceryList);
+        */
+
+        User user = new User("Colin", 22, 1000.0, cart, false, groceryList);
         Store store = LoadStore(path);
 
         ClearTerminal();

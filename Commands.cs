@@ -1,7 +1,27 @@
 ﻿using System;
 
 public static class Commands {
-    public static bool Command(string[] arguments, User user, Store store) {
+    // --- Public ---
+    // Function to handle user input
+    public static bool CommandLine(User user, Store store) {
+        Console.WriteLine("\n--------------------------------------------------");
+        Console.Write(">> ");
+        string command = Console.ReadLine(); // Get the user input
+        string[] arguments = command.Split(' '); // Split the input by spaces to get the arguments
+        Console.WriteLine("--------------------------------------------------");
+        ClearTerminal();
+        return Command(arguments, user, store);
+    }
+    // Function that is used by other functions / used to clear the screen (can be seen using 'clear' command)
+    public static void ClearTerminal() {
+        for (int i = 0; i < 30; i++) {
+            Console.WriteLine("\n");
+        }
+    }
+
+    // --- Private ---
+    // Internal function used to handle user input arguments
+    private static bool Command(string[] arguments, User user, Store store) {
         switch (arguments[0]) {
             case "set":
             if (arguments[1] == "name") {
@@ -12,7 +32,7 @@ public static class Commands {
             return true;
 
             case "add":
-            user.AddItem(arguments[1], int.Parse(arguments[2]), store, user.Age);
+            user.AddItem(arguments[1], int.Parse(arguments[2]), store);
             return true;
 
             case "remove":
@@ -40,7 +60,11 @@ public static class Commands {
             return true;
 
             case "search":
-            // Search function
+            if (arguments[1].GetType() == typeof(string)) {
+                store.SearchStore(arguments[1]);
+            } else {
+                store.SearchStore(arguments[1]);
+            }
             return true;
 
             case "list":
@@ -83,8 +107,8 @@ public static class Commands {
             return true;
         }
     }
-
-    public static void PrintHelp(bool ADMIN) {
+    // Prints the help menu that displays a list of commands
+    private static void PrintHelp(bool ADMIN) {
         Console.WriteLine("=========================[ List Of Commands ]=========================");
         Console.WriteLine("- help = Displays a list of commands");
         Console.WriteLine("- exit = Exits the program");
@@ -93,6 +117,7 @@ public static class Commands {
         Console.WriteLine("- cart = Lists all the items that are in your cart currently");
         Console.WriteLine("- checkout = Prints a receipt of your items if all the conditions are satisfied");
         Console.WriteLine("- options = Lists all the items that the store has and their quantity");
+        Console.WriteLine("- search [item] = Prints out information about a specific item");
         Console.WriteLine("- list = Prints out your grocery list");
         Console.WriteLine("- balance; bal = Prints out your balance");
         Console.WriteLine("- store = Prints out information about the current store");
@@ -109,8 +134,8 @@ public static class Commands {
 
         return;
     }
-
-    public static void SetValue(string option, double amount, User user, Store store) {
+    // Sets the values for user age, user balance, and store balance (ADMIN)
+    private static void SetValue(string option, double amount, User user, Store store) {
         if (string.IsNullOrEmpty(option)) {
             Console.WriteLine("[!] Invalid option! Please provide a valid option.");
             return;
@@ -132,8 +157,8 @@ public static class Commands {
             return;
         }
     }
-
-    public static void SetValue(string option, string value, User user, Store store) {
+    // Sets the values for user name (ADMIN)
+    private static void SetValue(string option, string value, User user, Store store) {
         if (string.IsNullOrEmpty(option)) {
             Console.WriteLine("[!] Invalid option! Please provide a valid option.");
             return;
@@ -150,23 +175,5 @@ public static class Commands {
             Console.WriteLine("[!] You do not have proper permissions to access this command!");
             return;
         }
-    }
-
-    public static void ClearTerminal() {
-        for (int i = 0; i < 30; i++) {
-            Console.WriteLine("\n");
-        }
-    }
-
-    public static bool CommandLine (User user, Store store) {
-        Console.WriteLine("\n--------------------------------------------------");
-        Console.Write(">> ");
-        string command = Console.ReadLine(); // Get the user input
-        string[] arguments = command.Split(' '); // Split the input by spaces to get the arguments
-        Console.WriteLine("--------------------------------------------------");
-
-        ClearTerminal();
-
-        return Command(arguments, user, store);
-    } 
+    }    
 }

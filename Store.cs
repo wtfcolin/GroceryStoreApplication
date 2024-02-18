@@ -5,40 +5,35 @@ using System.Security.Cryptography;
 using System.Text;
 
 public class Store {
-    private string storeName;
-    private string storeAddress;
-    private double storeBalance;
-    private double taxRate;
-    private readonly List<Food> inventory;
-
+    private string storeName; // Name of the store
+    private string storeAddress; // Address of the store
+    private double storeBalance; // Balance of the store
+    private double taxRate; // Tax rate for checkout functions and pricing calculations
+    private readonly List<Item> inventory; // Inventory for the stores with 'Item' objects
     /*
      * Constructor for 'Store' object
      * - storeName (string): Name of the store
      * - storeAddress (string): Name of the street the store is located [*street name*, *state abriviation*, *zipcode*]
      * - balance (double): Amount of money that the store currently has
      * - taxRate (double): The percentage of money that get's applied to the subtotal
-     * - inventory (List<Food>): List of food objects that the store currently has. Objects are loaded from a .csv file
+     * - inventory (List<Food>): List of items that the store currently has. Objects are loaded from a .csv file
      */
-    public Store(string storeName, string storeAddress, double storeBalance, double taxRate, List<Food> inventory) {
+    public Store(string storeName, string storeAddress, double storeBalance, double taxRate, List<Item> inventory) {
         StoreName = storeName;
         StoreAddress = storeAddress;
         StoreBalance = storeBalance;
         TaxRate = taxRate;
         this.inventory = inventory;
-
     }
-
     // Overflow constructor incase some values are null in objects from the file
     public Store(string storeName, double storeBalance) {
         StoreName = storeName;
         StoreBalance = storeBalance;
     }
-
     // Override function that displays information about the store (can be seen with 'store' command)
     public override string ToString() {
         return $"---[ Store Information ]---\nName: {StoreName}\nBalance: {StoreBalance:$#,##0.00}";
     }
-
     // Function that allows the user to view the store's inventory (can be seen with 'look' command)
     public void ViewStore() {
         List<string> categories = new();
@@ -50,18 +45,32 @@ public class Store {
             if (categories.Contains(storeItem.Category) == false) {
                 categories.Add(storeItem.Category);
                 Console.WriteLine($"\n---[ {storeItem.Category} ]---");
-                Console.WriteLine($"{storeItem}");
+                Console.WriteLine($"- {storeItem.Name} ({storeItem.Quantity}) | {storeItem.Category} | {storeItem.Price:$#,##0.00}/item | {storeItem.Calories} calories");
             } else {
-                Console.WriteLine($"{storeItem}");
+                Console.WriteLine($"- {storeItem.Name} ({storeItem.Quantity}) | {storeItem.Category} | {storeItem.Price:$#,##0.00}/item | {storeItem.Calories} calories");
             }
         }
 
         Console.WriteLine("==================================================");
         return;
     }
+    // Function that allows the user to look up a specific item based on the item's name (can be seen with 'search [item]' command)
+    public void SearchStore(string item) {
+        Console.WriteLine($"===========[ Items matching '{item}' ]============");
 
+        foreach (var storeItem in Inventory) {
+            if (storeItem.Name.ToLower() == item.Replace("_", " ").ToLower()) {
+                Console.WriteLine($"- {storeItem.Name} ({storeItem.Quantity}) | {storeItem.Category} | {storeItem.Price:$#,##0.00}/item | {storeItem.Calories} calories");
+                Console.WriteLine("==================================================");
+                return;
+            }
+        }
+        Console.WriteLine($"There were 0 results for '{item}'...");
+        Console.WriteLine("==================================================");
+        return;
+    }
     // Function that greets the user once they first open the program after short questioning
-    public void Greeting(string userName, double userBalance, int userAge, List<Food> Cart) {
+    public void Greeting(string userName, double userBalance, int userAge, List<Item> Cart) {
         Console.WriteLine("=========[ Grocery Shopping Application ]=========\n");
         Console.WriteLine($"\tYou are shopping at...\t{StoreName}\n");
 
@@ -70,14 +79,14 @@ public class Store {
             subtotal += cartItem.Price;
         }
 
-        Console.WriteLine($"\tItems in cart: {Cart.Count}     ({subtotal:$#,##0.00})");
+        Console.WriteLine($"\tItems in cart: {Cart.Count}  ({subtotal:$#,##0.00})");
         Console.WriteLine($"\tRemaining Balance: {userBalance - subtotal:$#,##0.00}\n");
         Console.WriteLine($"> Name: {userName}");
         Console.WriteLine($"> Age: {userAge}");
         Console.WriteLine($"> Balance: {userBalance:$#,##0.00}\n");
         Console.WriteLine("==================================================");
+        return;
     }
-
     // Function that handles the printing of the receipt and calculating total cost
     public void CheckOut(User user) {
         // Generates a unique store ID by getting a hash value from the store name
@@ -86,27 +95,26 @@ public class Store {
         var hashed = md5Hasher.ComputeHash(Encoding.UTF8.GetBytes(StoreName));
         int storeID = Math.Abs(BitConverter.ToInt32(hashed, 0));
 
-
         // Implement a random number generator that output's a different receipt file name
         Random randomNumber = new();
         string path = $"reciept-{randomNumber.Next(1000000)}.txt";
         using StreamWriter writer = new(path);
 
-        Console.WriteLine("===========[ Transaction Information ]============");
+        Console.WriteLine($"===========[ Reciept For {storeName} ]============");
         Console.WriteLine($"\t{StoreName.ToUpper()}");
         Console.WriteLine($"\tSTORE ID # {storeID}\n");
         Console.WriteLine($"\t{StoreAddress.ToUpper()}");
-        Console.WriteLine($"\tTel: +{randomNumber.Next(1000)}-{randomNumber.Next(1000)}-{randomNumber.Next(10000)}");
+        Console.WriteLine($"\tTEL: +{randomNumber.Next(1000)}-{randomNumber.Next(1000)}-{randomNumber.Next(10000)}");
         Console.WriteLine($"--------------------------------------------------");
-        Console.WriteLine($"Cashier:\t\t\t#{randomNumber.Next(10)}");
-        Console.WriteLine($"Manager:\t\t\tJOHN JAMESON");
+        Console.WriteLine($"CASHIER:\t\t\t#{randomNumber.Next(10)}");
+        Console.WriteLine($"MANAGER:\t\t\tJOHN JAMESON");
         Console.WriteLine($"--------------------------------------------------\n");
-        Console.WriteLine($"Name\t\tQty\tPrice\n");
+        Console.WriteLine($"NAME\t\t\tQTY\tPRICE\n");
         writer.WriteLine("===========[ Transaction Information ]============");
         writer.WriteLine($"\t{StoreName.ToUpper()}");
         writer.WriteLine($"\tSTORE ID # {storeID}\n");
         writer.WriteLine($"\t{StoreAddress.ToUpper()}");
-        writer.WriteLine($"\tTel: +{randomNumber.Next(1000)}-{randomNumber.Next(1000)}-{randomNumber.Next(10000)}");
+        writer.WriteLine($"\tTEL: +{randomNumber.Next(1000)}-{randomNumber.Next(1000)}-{randomNumber.Next(10000)}");
         writer.WriteLine($"--------------------------------------------------");
         writer.WriteLine($"CASHIER:\t\t\t#{randomNumber.Next(10)}");
         writer.WriteLine($"MANAGER:\t\t\tJOHN JAMESON");
@@ -115,7 +123,7 @@ public class Store {
 
         // Collect a running subtotal of all the items in the user's cart and print the item's name and price
         double subtotal = 0.00;
-        foreach (Food cartItem in user.Cart) {
+        foreach (Item cartItem in user.Cart) {
             if (cartItem.Name.Length >= 8) {
                 Console.WriteLine($"{cartItem.Name.ToUpper()}\t\t{cartItem.Quantity}\t{cartItem.Quantity * cartItem.Price:$#,##0.00}");
                 writer.WriteLine($"{cartItem.Name.ToUpper()}\t\t{cartItem.Quantity}\t{cartItem.Quantity * cartItem.Price:$#,##0.00}");
@@ -131,7 +139,6 @@ public class Store {
         // Subtract the total from the user's account and add the result to the store's account
         user.UserBalance -= (subtotal + (subtotal * TaxRate));
         StoreBalance += (subtotal + (subtotal * TaxRate));
-
 
         Console.WriteLine($"--------------------------------------------------\n");
         Console.WriteLine($"SUBTOTAL\t\t{subtotal:$#,##0.00}");
@@ -152,13 +159,11 @@ public class Store {
         writer.WriteLine($"CHANGE\t\t\t{(Math.Ceiling(subtotal + (subtotal * TaxRate))) - (subtotal + (subtotal * TaxRate)):$#,##0.00}\n");
         writer.WriteLine($"\t# ITEMS SOLD {user.Cart.Count}");
         writer.WriteLine($"\t{DateTime.Now.Month}/{DateTime.Now.Day}/{DateTime.Now.Year}   {DateTime.Now.ToUniversalTime()}");
-        writer.WriteLine("\n\t\tTHANK YOU!\n");
+        writer.WriteLine("\n\t\tThank You!\n");
         writer.WriteLine("Glad to see you again!");
         writer.WriteLine("==================================================");
-
         return;
     }
-    
     public string StoreName {
         get => storeName;
         set {
@@ -171,7 +176,6 @@ public class Store {
             storeName = value;
         }
     }
-
     public string StoreAddress {
         get => storeAddress;
         set {
@@ -184,7 +188,6 @@ public class Store {
             storeAddress = value;
         }
     }
-
     public double StoreBalance {
         get => storeBalance;
         set {
@@ -201,15 +204,13 @@ public class Store {
             storeBalance = value;
         }
     }
-
     public double TaxRate {
         get => taxRate;
         set {
             taxRate = value;
         }
     }
-
-    public List<Food> Inventory {
+    public List<Item> Inventory {
         get => inventory;
     }
 }

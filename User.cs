@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 
 public class User {
-    private string name;
-    private bool admin;
-    private int age;
-    private double userBalance;
-    private List<Food> cart;
-    private List<Food> groceryList;
+    private string name; // Name of the user
+    private bool admin; // Boolean value if user is an admin
+    private int age; // Age of the user
+    private double userBalance; // Balance of the user
+    private List<Item> cart; // Empty list that stores food items from the store inventory list
+    private List<Item> groceryList; // Empty list that stores food item references to be collected at the store.
 
     /*
      * Constructor for 'User' object
@@ -19,7 +18,7 @@ public class User {
      * - cart (List<Food>): Empty list that holds food objects that will be transfered from the store's list and the cart's list
      * - groceryList (List<Food>): Empty list that holds food objects that are references to items that the user needs to get
      */
-    public User(string name, int age, double userBalance, List<Food> cart, bool admin, List<Food> groceryList) {
+    public User(string name, int age, double userBalance, List<Item> cart, bool admin, List<Item> groceryList) {
         Name = name;
         Age = age;
         UserBalance = userBalance;
@@ -27,12 +26,10 @@ public class User {
         Admin = admin;
         GroceryList = groceryList;
     }
-
     // Override function that displays information about the user (can be seen using 'me' command)
     public override string ToString() {
         return $"---[ User Information ]---\nAge: {Age}\nBalance: {UserBalance:$#,##0.00}\nAdmin: {Admin}";
     }
-
     // Function that allows the user to view the current Food objects inside the cart list
     public void ViewCart() {
         int counter = 0;
@@ -52,7 +49,6 @@ public class User {
         Console.WriteLine("==================================================");
         return;
     }
-
     // Function that allows the user to view the current Food objects inside the groceryStore list
     public void ViewList() {
         Console.WriteLine("==============[ Your Grocery List ]===============");
@@ -69,17 +65,20 @@ public class User {
         Console.WriteLine("==================================================");
         return;
     }
+    // Function to add an item to the grocery list
+    public void AddItemOnList(User user) {
 
+    }
     // Function that allows the user to add items into their cart
-    public void AddItem(string item, int amount, Store store, int userAge) {
+    public void AddItem(string itemName, int amount, Store store) {
         bool storeItemExists = false;
 
         foreach (var storeItem in store.Inventory) {
             // For each food in inventory, check if the store has the item and its not out of stock
-            if (item.ToLower() == storeItem.Name.ToLower() && storeItem.Quantity > 0) {
+            if (itemName.ToLower().Replace("_", " ").ToLower() == storeItem.Name.ToLower() && storeItem.Quantity > 0) {
                 // For each food in inventory, check if the amount that was requested is less than the current stock
                 storeItemExists = true;
-                if (userAge < 21 && storeItem.Category == "Alcohol") {
+                if (Age < 21 && storeItem.Category == "Alcohol") {
                     Console.WriteLine("[!] This store does not sell alcohol to people younger than 21!");
                     return;
                 }
@@ -88,7 +87,7 @@ public class User {
                     bool cartItemExists = false;
                     foreach (var cartItem in Cart) {
                         // For each item in the cart, check to see if the item already exists in the cart and if they have the same name
-                        if (cartItem.Name.ToLower() == item.ToLower()) {
+                        if (cartItem.Name.ToLower().Replace("_", " ").ToLower() == itemName.ToLower()) {
                             // Add 1 to quantity to existing item
                             cartItem.Quantity += amount;
                             storeItem.Quantity -= amount;
@@ -99,7 +98,7 @@ public class User {
 
                     // Create a new food object and set the quantity to 1 while copying the other properties from the store
                     if (!cartItemExists) {
-                        Food newItem = new(storeItem.Name, amount, storeItem.Category, storeItem.Price, storeItem.Calories);
+                        Item newItem = new(storeItem.Name, amount, storeItem.Category, storeItem.Price, storeItem.Calories);
                         storeItem.Quantity -= amount;
                         Cart.Add(newItem);
                     }
@@ -108,30 +107,29 @@ public class User {
                     Console.WriteLine($"{amount} {storeItem.Name} was added to your cart!");
                 } else {
                     // If the amount is more than the store's quantity, give an error
-                    Console.WriteLine($"[!] There is not enough '{item}' in stock!");
+                    Console.WriteLine($"[!] There is not enough '{itemName.Replace("_", " ")}' in stock!");
                 }
                 break;
             }
         }
         // If there are no matching items in the store or if there is 0 stock, give an error
         if (!storeItemExists) {
-            Console.WriteLine($"[!] This store does not have any '{item}' or it is out of stock!");
+            Console.WriteLine($"[!] This store does not have any '{itemName.Replace("_", " ")}' or it is out of stock!");
         }
 
         return;
     }
-
     // Function that allows the user to remove items from their cart
     public void RemoveItem(string item, int amount, Store store) {
         bool check = true;
 
         foreach (var cartItem in Cart) {
             // For each item in the cart, find item with matching name and quantity is greater than 0
-            if (item.ToLower() == cartItem.Name.ToLower() && cartItem.Quantity > 0) {
+            if (item.Replace("_", " ").ToLower() == cartItem.Name.ToLower() && cartItem.Quantity > 0) {
                 check = false;
                 foreach (var storeItem in store.Inventory) {
                     // For each item in the store inventory, if item matches & current cart quantity is either = or > 0, then proceed with transaction
-                    if (storeItem.Name.ToLower() == item.ToLower()) {
+                    if (storeItem.Name.ToLower() == item.Replace("_", " ").ToLower()) {
                         // If the amount being removed is = or > 0, remove the items from cart and add to store inventory
                         if (cartItem.Quantity - amount == 0) {
                             Cart.Remove(cartItem);
@@ -143,7 +141,7 @@ public class User {
                             Console.WriteLine($"{amount} {storeItem.Name} was removed from your cart!");
                         // If the amount is more than what is in the cart, give an error
                         } else {
-                            Console.WriteLine($"[!] You do not have that many '{item}' in your cart!");
+                            Console.WriteLine($"[!] You do not have that many '{item.Replace("_", " ")}' in your cart!");
                         }
                     }
                 }
@@ -151,12 +149,11 @@ public class User {
         }
         // If there are no matching items in the cart, give an error
         if (check) {
-            Console.WriteLine($"[!] There is currently no '{item}' in your cart!");
+            Console.WriteLine($"[!] There is currently no '{item.Replace("_", " ").ToUpperInvariant()}' in your cart!");
         }
 
         return;
     }
-
     public string Name {
         get => name;
         set {
@@ -169,7 +166,6 @@ public class User {
             name = value;
         }
     }
-
     public int Age {
         get => age;
         set {
@@ -186,7 +182,6 @@ public class User {
             age = value;
         }
     }
-
     public double UserBalance {
         get => userBalance;
         set {
@@ -203,21 +198,18 @@ public class User {
             userBalance = value;
         }
     }
-
-    public List<Food> Cart {
+    public List<Item> Cart {
         get => cart;
         set {
             cart = value;
         }
     }
-
-    public List<Food> GroceryList {
+    public List<Item> GroceryList {
         get => groceryList;
         set {
             groceryList = value;
         }
     }
-
     public bool Admin {
         get => admin;
         set {

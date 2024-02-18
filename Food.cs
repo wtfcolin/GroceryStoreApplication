@@ -1,33 +1,36 @@
 ﻿using System;
 
-public class Food {
-    private string name; // Name of food item
-    private int quantity; // Quantity of the food item in the store
-    private string category; // Type of food for potential categorization
-    private double price; // Price for the food item (per 1)
-    private int calories; // Calories for the food item (per 1)
-
+public class Item {
+    private string name; // Name of item item
+    private int quantity; // Quantity of the item item in the store
+    private string category; // Type of item for potential categorization
+    private double price; // Price for the item item (per 1)
+    private int calories; // Calories for the item item (per 1)
     /*
-     * Constructor for the 'Food' object
-     * - name (string): Name of the food
-     * - quantity (int): Amount of the food
-     * - category (string): Type of food that object belongs to
+     * Constructor for the 'Item' object
+     * - name (string): Name of the item
+     * - quantity (int): Amount of the item
+     * - category (string): Type of item that object belongs to
      * - price (double): Price per item 
      * - calories (int): Claories per item
      */
-    public Food(string name, int quantity, string category, double price, int calories) {
+    public Item(string name, int quantity, string category, double price, int calories) {
         Name = name;
         Quantity = quantity;
         Category = category;
         Price = price;
         Calories = calories;
     }
-
-    // Override function that shows information about the food object
+    // Override function that shows information about the item
     public override string ToString() {
-        return $"- {Name} ({Quantity})\t\t| Price: {Price:$#,##0.00}\t\t| Category: {Category}\t\t| Calories: {Calories}";
+        if (Name.Length > 16) {
+            return $"- {Name} ({Quantity})\t\t\t|\t Price: {Price:$#,##0.00}\t|\tCategory: {Category}\t|\tCalories: {Calories}";
+        } else if (Name.Length > 8) {
+            return $"- {Name} ({Quantity})\t\t\t|\t Price: {Price:$#,##0.00}\t|\tCategory: {Category}\t|\tCalories: {Calories}";
+        } else {
+            return $"- {Name} ({Quantity})\t|\t Price: {Price:$#,##0.00}\t|\tCategory: {Category}\t|\tCalories: {Calories}";
+        }
     }
-
     public string Name {
         get => name;
         set {
@@ -40,7 +43,6 @@ public class Food {
             name = value;
         }
     }
-
     public int Quantity {
         get => quantity;
         set {
@@ -57,7 +59,6 @@ public class Food {
             quantity = value;
         }
     }
-
     public string Category {
         get => category;
         set {
@@ -70,7 +71,6 @@ public class Food {
             category = value;
         }
     }
-
     public double Price {
         get => price;
         set {
@@ -87,7 +87,6 @@ public class Food {
             price = value;
         }
     }
-
     public int Calories {
         get => calories;
         set {
