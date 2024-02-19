@@ -39,8 +39,6 @@ public class Store {
         List<string> categories = new();
         Console.WriteLine("===============[ Store Inventory ]================");
 
-        // Create a new list that will hold unique categories obtained through Food.Category. Seperate
-        // the printing of the items by category to format the output cleaner.
         foreach (var storeItem in Inventory) {
             if (categories.Contains(storeItem.Category) == false) {
                 categories.Add(storeItem.Category);
@@ -95,7 +93,6 @@ public class Store {
         var hashed = md5Hasher.ComputeHash(Encoding.UTF8.GetBytes(StoreName));
         int storeID = Math.Abs(BitConverter.ToInt32(hashed, 0));
 
-        // Implement a random number generator that output's a different receipt file name
         Random randomNumber = new();
         string path = $"reciept-{randomNumber.Next(1000000)}.txt";
         using StreamWriter writer = new(path);
@@ -121,7 +118,6 @@ public class Store {
         writer.WriteLine($"--------------------------------------------------\n");
         writer.WriteLine($"NAME\t\tQTY\tPRICE\n");
 
-        // Collect a running subtotal of all the items in the user's cart and print the item's name and price
         double subtotal = 0.00;
         foreach (Item cartItem in user.Cart) {
             if (cartItem.Name.Length >= 8) {
@@ -136,7 +132,6 @@ public class Store {
         }
         Console.WriteLine(" ");
 
-        // Subtract the total from the user's account and add the result to the store's account
         user.UserBalance -= (subtotal + (subtotal * TaxRate));
         StoreBalance += (subtotal + (subtotal * TaxRate));
 
@@ -151,6 +146,7 @@ public class Store {
         Console.WriteLine("\t\tTHANK YOU!\n");
         Console.WriteLine("\t\tGlad to see you again!");
         Console.WriteLine("==================================================");
+
         writer.WriteLine($"--------------------------------------------------\n");
         writer.WriteLine($"SUBTOTAL\t\t\t{subtotal:$#,##0.00}");
         writer.WriteLine($"TAX ({TaxRate:0%})\t\t{(subtotal * TaxRate):$#,##0.00}");
@@ -162,6 +158,7 @@ public class Store {
         writer.WriteLine("\n\t\tThank You!\n");
         writer.WriteLine("Glad to see you again!");
         writer.WriteLine("==================================================");
+
         return;
     }
     public string StoreName {

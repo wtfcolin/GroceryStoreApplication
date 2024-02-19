@@ -62,6 +62,7 @@ public class Program {
 
         List<Item> cart = new();
         List<Item> groceryList = new();
+        List<Recipe> recipeList = new();
 
         // Prompt the user before the program starts to enter personal information
         /*
@@ -78,7 +79,7 @@ public class Program {
         User user = new User(name, age, balance, cart, false, groceryList);
         */
 
-        User user = new User("Colin", 22, 1000.0, cart, false, groceryList);
+        User user = new User("Colin", 22, 1000.0, cart, false, groceryList, recipeList);
         Store store = LoadStore(path);
 
         ClearTerminal();

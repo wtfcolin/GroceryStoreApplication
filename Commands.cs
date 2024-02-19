@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 
 public static class Commands {
-    // --- Public ---
     // Function to handle user input
     public static bool CommandLine(User user, Store store) {
         Console.WriteLine("\n--------------------------------------------------");
@@ -19,7 +19,6 @@ public static class Commands {
         }
     }
 
-    // --- Private ---
     // Internal function used to handle user input arguments
     private static bool Command(string[] arguments, User user, Store store) {
         switch (arguments[0]) {
@@ -90,6 +89,14 @@ public static class Commands {
             }
             return true;
 
+            case "createrecipe":
+            CreateRecipe(store, user);
+            return true;
+
+            case "removerecipe":
+            RemoveRecipe(user);
+            return true;
+
             case "me":
             Console.WriteLine(user);
             return true;
@@ -107,6 +114,7 @@ public static class Commands {
             return true;
         }
     }
+
     // Prints the help menu that displays a list of commands
     private static void PrintHelp(bool ADMIN) {
         Console.WriteLine("=========================[ List Of Commands ]=========================");
@@ -134,6 +142,7 @@ public static class Commands {
 
         return;
     }
+    
     // Sets the values for user age, user balance, and store balance (ADMIN)
     private static void SetValue(string option, double amount, User user, Store store) {
         if (string.IsNullOrEmpty(option)) {
@@ -157,6 +166,7 @@ public static class Commands {
             return;
         }
     }
+    
     // Sets the values for user name (ADMIN)
     private static void SetValue(string option, string value, User user, Store store) {
         if (string.IsNullOrEmpty(option)) {
@@ -175,5 +185,69 @@ public static class Commands {
             Console.WriteLine("[!] You do not have proper permissions to access this command!");
             return;
         }
-    }    
+    }
+
+    // Creates a recipe for the user and appends it to their personal recipe list
+    public static void CreateRecipe(Store store, User user) {
+        for (int i = 0; i < 30; i++) {
+            Console.WriteLine("\n");
+        }
+
+        Console.WriteLine("What is the name of your recipe?");
+        Console.WriteLine("--------------------------------------------------");
+        Console.Write(">> ");
+        string name = Console.ReadLine();
+        bool toggle = true;
+
+        while (toggle) {
+            for (int i = 0; i < 30; i++) {
+                Console.WriteLine("\n");
+            }
+
+            Console.WriteLine("Please enter an ingredient name and amount seperated by a space (Ex: Burger_Patty 2, Apple 4, ...)");
+            Console.WriteLine("When you are finished adding ingredients, type 'done'.");
+            Console.WriteLine("--------------------------------------------------");
+            Console.Write(">> ");
+            string command = Console.ReadLine();
+            string[] arguments = command.Split(" ");
+            List<Item> ingredients = new();
+
+            if (arguments[0].GetType() == typeof(string) && arguments[1].GetType() == typeof(int)) {
+                foreach (var storeItem in store.Inventory) {
+                    if (arguments[1].Replace("_", " ").ToLower() == storeItem.Name.ToLower() && storeItem.Quantity >= int.Parse(arguments[2])) {
+                        storeItem.Quantity = int.Parse(arguments[2]);
+                        ingredients.Add(storeItem);
+                    }
+                }
+            } else if (arguments[0] == "done") {
+                Recipe recipe = new Recipe(name, ingredients);
+                user.RecipeList.Add(recipe);
+                return;
+            } else {
+                Console.WriteLine("[!] Invalid syntax! You must provide a name and amount seperated by a space (Ex: Burger_Patty 2, Apple 4, ...");
+            }
+        }
+    }
+
+    // Removes a recipe from the user's personal recipe list
+    public static void RemoveRecipe(User user) {
+        for (int i = 0; i < 30; i++) {
+            Console.WriteLine("\n");
+        }
+
+        Console.WriteLine("What is the name of your recipe?");
+        Console.WriteLine("--------------------------------------------------");
+        Console.Write(">> ");
+        string name = Console.ReadLine();
+
+        foreach (var recipe in user.RecipeList) {
+            if (name.Replace("_"," ").ToLower() == recipe.Name.ToLower()) {
+                user.RecipeList.Remove(recipe);
+                return;
+            }
+
+            Console.WriteLine($"[!] There is no recipe with the name '{name}'!");
+            return;
+        }
+    }
 }

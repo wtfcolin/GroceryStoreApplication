@@ -7,24 +7,17 @@ public class User {
     private int age; // Age of the user
     private double userBalance; // Balance of the user
     private List<Item> cart; // Empty list that stores food items from the store inventory list
-    private List<Item> groceryList; // Empty list that stores food item references to be collected at the store.
+    private List<Item> groceryList; // Empty list that stores food item references to be collected at the store
+    private List<Recipe> recipeList; // Empty list that stores the user's personal recipes
 
-    /*
-     * Constructor for 'User' object
-     * - name (string): Name of the user
-     * - admin (bool): toggle for admin permissions (can be obtained with 'admin123' command)
-     * - age (int): Age of the user
-     * - userBalance (int): Balance of the user
-     * - cart (List<Food>): Empty list that holds food objects that will be transfered from the store's list and the cart's list
-     * - groceryList (List<Food>): Empty list that holds food objects that are references to items that the user needs to get
-     */
-    public User(string name, int age, double userBalance, List<Item> cart, bool admin, List<Item> groceryList) {
+    public User(string name, int age, double userBalance, List<Item> cart, bool admin, List<Item> groceryList, List<Recipe> recipeList) {
         Name = name;
         Age = age;
         UserBalance = userBalance;
         Cart = cart;
         Admin = admin;
         GroceryList = groceryList;
+        RecipeList = recipeList;
     }
     // Override function that displays information about the user (can be seen using 'me' command)
     public override string ToString() {
@@ -53,7 +46,6 @@ public class User {
     public void ViewList() {
         Console.WriteLine("==============[ Your Grocery List ]===============");
 
-        // If the groceryList is empty, print a message that let's the user know that the list is empty
         if (GroceryList.Count == 0) {
             Console.WriteLine("There are currently 0 items on your grocery list...");
         } else {
@@ -65,18 +57,12 @@ public class User {
         Console.WriteLine("==================================================");
         return;
     }
-    // Function to add an item to the grocery list
-    public void AddItemOnList(User user) {
-
-    }
     // Function that allows the user to add items into their cart
     public void AddItem(string itemName, int amount, Store store) {
         bool storeItemExists = false;
 
         foreach (var storeItem in store.Inventory) {
-            // For each food in inventory, check if the store has the item and its not out of stock
             if (itemName.ToLower().Replace("_", " ").ToLower() == storeItem.Name.ToLower() && storeItem.Quantity > 0) {
-                // For each food in inventory, check if the amount that was requested is less than the current stock
                 storeItemExists = true;
                 if (Age < 21 && storeItem.Category == "Alcohol") {
                     Console.WriteLine("[!] This store does not sell alcohol to people younger than 21!");
@@ -86,9 +72,7 @@ public class User {
                 if (storeItem.Quantity >= amount) {
                     bool cartItemExists = false;
                     foreach (var cartItem in Cart) {
-                        // For each item in the cart, check to see if the item already exists in the cart and if they have the same name
                         if (cartItem.Name.ToLower().Replace("_", " ").ToLower() == itemName.ToLower()) {
-                            // Add 1 to quantity to existing item
                             cartItem.Quantity += amount;
                             storeItem.Quantity -= amount;
                             cartItemExists = true;
@@ -96,23 +80,19 @@ public class User {
                         }
                     }
 
-                    // Create a new food object and set the quantity to 1 while copying the other properties from the store
                     if (!cartItemExists) {
                         Item newItem = new(storeItem.Name, amount, storeItem.Category, storeItem.Price, storeItem.Calories);
                         storeItem.Quantity -= amount;
                         Cart.Add(newItem);
                     }
 
-                    // Tell the user that the item was added to their cart
                     Console.WriteLine($"{amount} {storeItem.Name} was added to your cart!");
                 } else {
-                    // If the amount is more than the store's quantity, give an error
                     Console.WriteLine($"[!] There is not enough '{itemName.Replace("_", " ")}' in stock!");
                 }
                 break;
             }
         }
-        // If there are no matching items in the store or if there is 0 stock, give an error
         if (!storeItemExists) {
             Console.WriteLine($"[!] This store does not have any '{itemName.Replace("_", " ")}' or it is out of stock!");
         }
@@ -208,6 +188,12 @@ public class User {
         get => groceryList;
         set {
             groceryList = value;
+        }
+    }
+    public List<Recipe> RecipeList {
+        get => recipeList;
+        set {
+            recipeList = value;
         }
     }
     public bool Admin {
