@@ -46,16 +46,16 @@ public static class Commands {
             user.ViewCart();
             return true;
 
-            case "options":
+            case "look":
             store.ViewStore();
             return true;
 
             case "balance":
-            Console.WriteLine(user.UserBalance);
+            user.ViewBalance();
             return true;
 
             case "bal":
-            Console.WriteLine(user.UserBalance);
+            user.ViewBalance();
             return true;
 
             case "search":
@@ -119,14 +119,21 @@ public static class Commands {
     private static void PrintHelp(bool ADMIN) {
         Console.WriteLine("=========================[ List Of Commands ]=========================");
         Console.WriteLine("- help = Displays a list of commands");
-        Console.WriteLine("- exit = Exits the program");
+        Console.WriteLine("- exit = Exits the program\n");
+
+        Console.WriteLine("- list = Prints out your grocery list");
+        Console.WriteLine("- cart = Prints out the items in your cart");
         Console.WriteLine("- add [item] [amount] = Adds a food item to your cart");
         Console.WriteLine("- remove [item] [amount] = Removes a food item from your cart");
-        Console.WriteLine("- cart = Lists all the items that are in your cart currently");
-        Console.WriteLine("- checkout = Prints a receipt of your items if all the conditions are satisfied");
-        Console.WriteLine("- options = Lists all the items that the store has and their quantity");
-        Console.WriteLine("- search [item] = Prints out information about a specific item");
-        Console.WriteLine("- list = Prints out your grocery list");
+        Console.WriteLine("- checkout = Prints a receipt of your items if all the conditions are satisfied\n");
+
+        Console.WriteLine("- look = Lists all the items that the store has and their quantity");
+        Console.WriteLine("- search [item] = Prints out information about a specific item\n");
+
+        Console.WriteLine("- recipes = Prints out your recipe list");
+        Console.WriteLine("- createrecipe = Asks you questions to create a recipe");
+        Console.WriteLine("- removerecipe = Removes a recipe from your personal recipe list\n");
+
         Console.WriteLine("- balance; bal = Prints out your balance");
         Console.WriteLine("- store = Prints out information about the current store");
         Console.WriteLine("- me = Prints out information about the current user");

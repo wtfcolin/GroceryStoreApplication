@@ -21,7 +21,21 @@ public class User {
     }
     // Override function that displays information about the user (can be seen using 'me' command)
     public override string ToString() {
-        return $"---[ User Information ]---\nAge: {Age}\nBalance: {UserBalance:$#,##0.00}\nAdmin: {Admin}";
+        return $"---[ Your Information ]---\nAge:\t\t{Age}\nBalance:\t{UserBalance:$#,##0.00}\nAdmin:\t\t{Admin}\n--------------------------";
+    }
+    // Function that allows the user to view their current balance subtracted by the current items in their cart
+    public void ViewBalance() {
+        Console.WriteLine("---[ Your Balance ]---");
+        Console.WriteLine($"Current Balance:\t{UserBalance:$#,##0.00}");
+
+        double total = 0.00;
+        foreach (var item in Cart) {
+            total += item.Price;
+        }
+        
+        Console.WriteLine($"Cart Running Total:\t{total:$#,##0.00}");
+        Console.WriteLine($"New Balance:\t\t{UserBalance - total:$#,##0.00}");
+        Console.WriteLine("--------------------------");
     }
     // Function that allows the user to view the current Food objects inside the cart list
     public void ViewCart() {
