@@ -2,43 +2,43 @@
 using System.Collections.Generic;
 
 public class Recipe {
-    private string name;
-    private List<Item> ingredient;
+    private string recipeName;
+    private List<Item> recipeIngredients;
     /*
      * Constructor for 'Recipe' object
      * 
      */
-    public Recipe(string name, List<Item> ingredient) {
-        Name = name;
-        Ingredient = ingredient;
+    public Recipe(string recipeName, List<Item> ingredients) {
+        RecipeName = recipeName;
+        RecipeIngredients = ingredients;
     }
 
     public override string ToString() {
         string ingredientsList = "";
 
-        foreach (var item in Ingredient) {
-            ingredientsList += $"- {item.Quantity} {item.Name}\n";    
+        foreach (Item ingredient in RecipeIngredients) {
+            ingredientsList += $"- {ingredient.Quantity} {ingredient.Name}\n";    
         }
 
-        return $"---[ Recipe Information ]---\nName: {Name}\nIngredients:\n{ingredientsList}";
+        return $"---[ Recipe Information ]---\nName: {RecipeName}\nIngredients:\n{ingredientsList}";
     }
 
-    public string Name {
-        get => name;
+    public string RecipeName {
+        get => recipeName;
         set {
             // Set the name to 'NONE' if the input is empty/null
             if (string.IsNullOrWhiteSpace(value)) {
                 Console.WriteLine("[!] Invalid name! Name was set to 'NONE'.");
-                name = "NONE";
+                recipeName = "NONE";
             }
 
-            name = value;
+            recipeName = value;
         }
     }
-    public List<Item> Ingredient {
-        get => ingredient;
+    public List<Item> RecipeIngredients {
+        get => recipeIngredients;
         set {
-            ingredient = value;
+            recipeIngredients = value;
         }
     }
 }

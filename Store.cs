@@ -1,39 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Security.Cryptography;
-using System.Text;
 
 public class Store {
+    private int storeID; // ID of the store
     private string storeName; // Name of the store
     private string storeAddress; // Address of the store
     private double storeBalance; // Balance of the store
     private double taxRate; // Tax rate for checkout functions and pricing calculations
     private readonly List<Item> inventory; // Inventory for the stores with 'Item' objects
-    /*
-     * Constructor for 'Store' object
-     * - storeName (string): Name of the store
-     * - storeAddress (string): Name of the street the store is located [*street name*, *state abriviation*, *zipcode*]
-     * - balance (double): Amount of money that the store currently has
-     * - taxRate (double): The percentage of money that get's applied to the subtotal
-     * - inventory (List<Food>): List of items that the store currently has. Objects are loaded from a .csv file
-     */
-    public Store(string storeName, string storeAddress, double storeBalance, double taxRate, List<Item> inventory) {
+    
+    // Constructor for 'Store' object
+    public Store(int storeID, string storeName, string storeAddress, double storeBalance, double taxRate, List<Item> inventory) {
+        StoreID = storeID;
         StoreName = storeName;
         StoreAddress = storeAddress;
         StoreBalance = storeBalance;
         TaxRate = taxRate;
         this.inventory = inventory;
     }
+
     // Overflow constructor incase some values are null in objects from the file
     public Store(string storeName, double storeBalance) {
         StoreName = storeName;
         StoreBalance = storeBalance;
     }
+
     // Override function that displays information about the store (can be seen with 'store' command)
     public override string ToString() {
-        return $"---[ Store Information ]---\nName: {StoreName}\nBalance: {StoreBalance:$#,##0.00}";
+        return $"--------------[ Store Information ]---------------\nName: {StoreName}\nBalance: {StoreBalance:$#,##0.00}\n--------------------------------------------------";
     }
+
     // Function that allows the user to view the store's inventory (can be seen with 'look' command)
     public void ViewStore() {
         List<string> categories = new();
@@ -43,18 +40,20 @@ public class Store {
             if (categories.Contains(storeItem.Category) == false) {
                 categories.Add(storeItem.Category);
                 Console.WriteLine($"\n---[ {storeItem.Category} ]---");
-                Console.WriteLine($"- {storeItem.Name} ({storeItem.Quantity}) | {storeItem.Category} | {storeItem.Price:$#,##0.00}/item | {storeItem.Calories} calories");
+                Console.WriteLine($"- {storeItem.Name} ({storeItem.Quantity}) | {storeItem.Price:$#,##0.00}/item | {storeItem.Calories} calories");
             } else {
-                Console.WriteLine($"- {storeItem.Name} ({storeItem.Quantity}) | {storeItem.Category} | {storeItem.Price:$#,##0.00}/item | {storeItem.Calories} calories");
+                Console.WriteLine($"- {storeItem.Name} ({storeItem.Quantity}) | {storeItem.Price:$#,##0.00}/item | {storeItem.Calories} calories");
             }
         }
 
         Console.WriteLine("==================================================");
         return;
     }
+
     // Function that allows the user to look up a specific item based on the item's name (can be seen with 'search [item]' command)
     public void SearchStore(string item) {
-        Console.WriteLine($"===========[ Items matching '{item}' ]============");
+        Console.WriteLine("================[ Search Results ]================");
+        Console.WriteLine($"Search Term... {item}\n");
 
         foreach (var storeItem in Inventory) {
             if (storeItem.Name.ToLower() == item.Replace("_", " ").ToLower()) {
@@ -67,10 +66,11 @@ public class Store {
         Console.WriteLine("==================================================");
         return;
     }
+
     // Function that greets the user once they first open the program after short questioning
     public void Greeting(string userName, double userBalance, int userAge, List<Item> Cart) {
         Console.WriteLine("=========[ Grocery Shopping Application ]=========\n");
-        Console.WriteLine($"\tYou are shopping at...\t{StoreName}\n");
+        Console.WriteLine($"\tYou are shopping at...  {StoreName}\n");
 
         double subtotal = 0.0;
         foreach (var cartItem in Cart) {
@@ -85,21 +85,17 @@ public class Store {
         Console.WriteLine("==================================================");
         return;
     }
+
     // Function that handles the printing of the receipt and calculating total cost
     public void CheckOut(User user) {
-        // Generates a unique store ID by getting a hash value from the store name
-        // Credit: https://stackoverflow.com/questions/26870267/generate-integer-based-on-any-given-string-without-gethashcode
-        MD5 md5Hasher = MD5.Create();
-        var hashed = md5Hasher.ComputeHash(Encoding.UTF8.GetBytes(StoreName));
-        int storeID = Math.Abs(BitConverter.ToInt32(hashed, 0));
-
         Random randomNumber = new();
+        int storeID = randomNumber.Next(10000000);
         string path = $"reciept-{randomNumber.Next(1000000)}.txt";
         using StreamWriter writer = new(path);
 
         Console.WriteLine($"===========[ Reciept For {storeName} ]============");
         Console.WriteLine($"\t{StoreName.ToUpper()}");
-        Console.WriteLine($"\tSTORE ID # {storeID}\n");
+        Console.WriteLine($"\tSTORE ID # {StoreID}\n");
         Console.WriteLine($"\t{StoreAddress.ToUpper()}");
         Console.WriteLine($"\tTEL: +{randomNumber.Next(1000)}-{randomNumber.Next(1000)}-{randomNumber.Next(10000)}");
         Console.WriteLine($"--------------------------------------------------");
@@ -109,7 +105,7 @@ public class Store {
         Console.WriteLine($"NAME\t\t\tQTY\tPRICE\n");
         writer.WriteLine("===========[ Transaction Information ]============");
         writer.WriteLine($"\t{StoreName.ToUpper()}");
-        writer.WriteLine($"\tSTORE ID # {storeID}\n");
+        writer.WriteLine($"\tSTORE ID # {StoreID}\n");
         writer.WriteLine($"\t{StoreAddress.ToUpper()}");
         writer.WriteLine($"\tTEL: +{randomNumber.Next(1000)}-{randomNumber.Next(1000)}-{randomNumber.Next(10000)}");
         writer.WriteLine($"--------------------------------------------------");
@@ -161,6 +157,13 @@ public class Store {
 
         return;
     }
+    
+    public int StoreID {
+        get => storeID;
+        set {
+            storeID = value;
+        }
+    }
     public string StoreName {
         get => storeName;
         set {
@@ -188,11 +191,11 @@ public class Store {
     public double StoreBalance {
         get => storeBalance;
         set {
-            // Set the balance to '0' if the input is empty/null.
+            // Check for type: double
             if (value.GetType() != typeof(double)) {
                 Console.WriteLine("[!] Invalid balance! Balance was set to '0' instead.");
                 storeBalance = 0;
-                // Set the balance to '0' if the balance is less than 0.
+                // Check for range: balance < 0
             } else if (value < 0) {
                 Console.WriteLine("[!] The balance can't be less than $0! Balance was set to '0.0' instead.");
                 storeBalance = 0;

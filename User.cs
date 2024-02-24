@@ -19,10 +19,12 @@ public class User {
         GroceryList = groceryList;
         RecipeList = recipeList;
     }
+
     // Override function that displays information about the user (can be seen using 'me' command)
     public override string ToString() {
         return $"---[ Your Information ]---\nAge:\t\t{Age}\nBalance:\t{UserBalance:$#,##0.00}\nAdmin:\t\t{Admin}\n--------------------------";
     }
+
     // Function that allows the user to view their current balance subtracted by the current items in their cart
     public void ViewBalance() {
         Console.WriteLine("---[ Your Balance ]---");
@@ -37,16 +39,15 @@ public class User {
         Console.WriteLine($"New Balance:\t\t{UserBalance - total:$#,##0.00}");
         Console.WriteLine("--------------------------");
     }
+
     // Function that allows the user to view the current Food objects inside the cart list
     public void ViewCart() {
         int counter = 0;
         Console.WriteLine("==================[ Your Cart ]===================");
 
-        // If the cart is empty, tell the user that the cart is empty
         if (Cart.Count == 0) {
             Console.WriteLine("There are currently 0 items in your cart...");
         } else {
-            // For each item in the cart, print out information about the item to the user in a numbered list (can be seen using 'cart' command)
             foreach (var cartItem in Cart) {
                 counter++;
                 Console.WriteLine($"{counter}) {cartItem.Quantity} {cartItem.Name} [{cartItem.Quantity * cartItem.Price:$#,##0.00}]");
@@ -56,6 +57,7 @@ public class User {
         Console.WriteLine("==================================================");
         return;
     }
+
     // Function that allows the user to view the current Food objects inside the groceryStore list
     public void ViewList() {
         Console.WriteLine("==============[ Your Grocery List ]===============");
@@ -107,6 +109,7 @@ public class User {
                 break;
             }
         }
+
         if (!storeItemExists) {
             Console.WriteLine($"[!] This store does not have any '{itemName.Replace("_", " ")}' or it is out of stock!");
         }
@@ -115,12 +118,12 @@ public class User {
     }
     // Function that allows the user to remove items from their cart
     public void RemoveItem(string item, int amount, Store store) {
-        bool check = true;
+        bool storeItemExists = false;
 
         foreach (var cartItem in Cart) {
             // For each item in the cart, find item with matching name and quantity is greater than 0
             if (item.Replace("_", " ").ToLower() == cartItem.Name.ToLower() && cartItem.Quantity > 0) {
-                check = false;
+                storeItemExists = true;
                 foreach (var storeItem in store.Inventory) {
                     // For each item in the store inventory, if item matches & current cart quantity is either = or > 0, then proceed with transaction
                     if (storeItem.Name.ToLower() == item.Replace("_", " ").ToLower()) {
@@ -142,12 +145,13 @@ public class User {
             }
         }
         // If there are no matching items in the cart, give an error
-        if (check) {
-            Console.WriteLine($"[!] There is currently no '{item.Replace("_", " ").ToUpperInvariant()}' in your cart!");
+        if (!storeItemExists) {
+            Console.WriteLine($"[!] There is currently no '{item.Replace("_", " ")}' in your cart!");
         }
 
         return;
     }
+
     public string Name {
         get => name;
         set {

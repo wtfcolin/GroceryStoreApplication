@@ -24,6 +24,7 @@ public class Program {
     private static Store LoadStore(string path) {
         try {
             using StreamReader reader = new StreamReader(path);
+            int storeID = 80342271; // ID of the store.
             string storeName = reader.ReadLine(); // Name of the store in the CSV file.
             string storeAddress = reader.ReadLine(); // Address of the store in the CSV file.
             double storeBalance = double.Parse(reader.ReadLine()); // Balance of the store in the CSV file.
@@ -47,9 +48,10 @@ public class Program {
                 inventory.Add(item);
             }
 
-            Store store = new Store(storeName, storeAddress, storeBalance, 0.15, inventory);
+            Store store = new Store(storeID, storeName, storeAddress, storeBalance, 0.15, inventory);
             return store;
         } catch {
+            ClearTerminal();
             Console.WriteLine("[!] Loading items was unsuccessful, check the syntax of the CSV file!");
             Store store = new Store("NONE", 0);
             return store;

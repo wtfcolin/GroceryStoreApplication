@@ -4,11 +4,11 @@ using System.Collections.Generic;
 public static class Commands {
     // Function to handle user input
     public static bool CommandLine(User user, Store store) {
-        Console.WriteLine("\n--------------------------------------------------");
+        Console.WriteLine("\n==================================================");
         Console.Write(">> ");
         string command = Console.ReadLine(); // Get the user input
         string[] arguments = command.Split(' '); // Split the input by spaces to get the arguments
-        Console.WriteLine("--------------------------------------------------");
+        Console.WriteLine("\n==================================================");
         ClearTerminal();
         return Command(arguments, user, store);
     }
@@ -23,19 +23,37 @@ public static class Commands {
     private static bool Command(string[] arguments, User user, Store store) {
         switch (arguments[0]) {
             case "set":
-            if (arguments[1] == "name") {
-                SetValue(arguments[1], arguments[2], user, store);
+            if (arguments.Length > 1) {
+                if (arguments[1] == "name") {
+                    SetValue(arguments[1], arguments[2], user, store);
+                } else if ((arguments[1] == "age" && arguments[2].GetType() == typeof(int))|| (arguments[1] == "balance" && arguments[2].GetType() == typeof(int))) {
+                    SetValue(arguments[1], double.Parse(arguments[2]), user, store);
+                } else {
+                    Console.WriteLine("[!] Invalid syntax! (set {option} {value})");
+                }
             } else {
-                SetValue(arguments[1], double.Parse(arguments[2]), user, store);
+                Console.WriteLine("[!] Invalid syntax! (set {option} {value})");
             }
             return true;
 
             case "add":
-            user.AddItem(arguments[1], int.Parse(arguments[2]), store);
+            if (arguments.Length > 1) {
+                user.AddItem(arguments[1], int.Parse(arguments[2]), store);
+            } else {
+                Console.WriteLine("[!] Invalid syntax! (add {item name} {amount})");
+            }
             return true;
 
             case "remove":
-            user.RemoveItem(arguments[1], int.Parse(arguments[2]), store);
+            if (arguments.Length > 1) {
+                if (arguments[2].GetType() == typeof(int)) {
+                    user.RemoveItem(arguments[1], int.Parse(arguments[2]), store);
+                } else {
+                    Console.WriteLine("[!] Invalid syntax! (remove {item name} {amount}");
+                }
+            } else {
+                Console.WriteLine("[!] Invalid syntax! (remove {item name} {amount}");
+            }
             return true;
 
             case "help":
@@ -54,15 +72,11 @@ public static class Commands {
             user.ViewBalance();
             return true;
 
-            case "bal":
-            user.ViewBalance();
-            return true;
-
             case "search":
-            if (arguments[1].GetType() == typeof(string)) {
+            if (arguments.Length > 1) {
                 store.SearchStore(arguments[1]);
             } else {
-                store.SearchStore(arguments[1]);
+                Console.WriteLine("[!] Invalid syntax! (search {item name})");
             }
             return true;
 
@@ -117,7 +131,7 @@ public static class Commands {
 
     // Prints the help menu that displays a list of commands
     private static void PrintHelp(bool ADMIN) {
-        Console.WriteLine("=========================[ List Of Commands ]=========================");
+        Console.WriteLine("===============[ List Of Commands ]===============");
         Console.WriteLine("- help = Displays a list of commands");
         Console.WriteLine("- exit = Exits the program\n");
 
@@ -134,7 +148,7 @@ public static class Commands {
         Console.WriteLine("- createrecipe = Asks you questions to create a recipe");
         Console.WriteLine("- removerecipe = Removes a recipe from your personal recipe list\n");
 
-        Console.WriteLine("- balance; bal = Prints out your balance");
+        Console.WriteLine("- balance = Prints out your current balance");
         Console.WriteLine("- store = Prints out information about the current store");
         Console.WriteLine("- me = Prints out information about the current user");
 
@@ -221,7 +235,7 @@ public static class Commands {
 
             if (arguments[0].GetType() == typeof(string) && arguments[1].GetType() == typeof(int)) {
                 foreach (var storeItem in store.Inventory) {
-                    if (arguments[1].Replace("_", " ").ToLower() == storeItem.Name.ToLower() && storeItem.Quantity >= int.Parse(arguments[2])) {
+                    if (arguments[0].Replace("_", " ").ToLower() == storeItem.Name.ToLower() && storeItem.Quantity >= int.Parse(arguments[1])) {
                         storeItem.Quantity = int.Parse(arguments[2]);
                         ingredients.Add(storeItem);
                     }
@@ -243,12 +257,12 @@ public static class Commands {
         }
 
         Console.WriteLine("What is the name of your recipe?");
-        Console.WriteLine("--------------------------------------------------");
+        Console.WriteLine("==================================================");
         Console.Write(">> ");
         string name = Console.ReadLine();
 
         foreach (var recipe in user.RecipeList) {
-            if (name.Replace("_"," ").ToLower() == recipe.Name.ToLower()) {
+            if (name.Replace("_"," ").ToLower() == recipe.RecipeName.ToLower()) {
                 user.RecipeList.Remove(recipe);
                 return;
             }
