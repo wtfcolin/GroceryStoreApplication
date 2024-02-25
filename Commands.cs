@@ -238,12 +238,13 @@ public static class Commands {
     /*  Creates a recipe for the user and appends it to their personal recipe list
     */
     public static void CreateRecipe(Store store, User user, bool toggle) {
+        List<Item> ingredients = new();
+
         ClearTerminal();
         Console.WriteLine("What is the name of your recipe?");
         Console.WriteLine("==================================================");
         Console.Write(">> ");
         string name = Console.ReadLine();
-
         ClearTerminal();
 
         while (toggle) {
@@ -253,8 +254,6 @@ public static class Commands {
             Console.Write(">> ");
             string command = Console.ReadLine();
             string[] arguments = command.Split(" ");
-            List<Item> ingredients = new();
-
 
             if (arguments.Length > 1) {
                 try {
@@ -264,7 +263,7 @@ public static class Commands {
                             ClearTerminal();
                             Console.WriteLine($"Added {arguments[1]} {storeItem.Name} to your '{name}' recipe!");
                             storeItem.Quantity = int.Parse(arguments[1]);
-                            ingredients.Add(storeItem);
+                            ingredients.Add(storeItem);      
                             count++;
                         }
                     }
@@ -279,7 +278,7 @@ public static class Commands {
                 }
             } else if (arguments[0] == "look") {
                 store.ViewStore();
-            } else if (arguments[0] == "search") {
+            } else if (arguments[0] == "search" /* NEEDS FIXING */) {
                 try {
                     int count = 0;
                     foreach (var item in store.Inventory) {
@@ -299,13 +298,8 @@ public static class Commands {
                 ClearTerminal();
                 Recipe recipe = new(name, ingredients);
                 user.RecipeList.Add(recipe);
-                Console.WriteLine($"'{recipe.RecipeName}' recipe has been created successfully!");
-                Console.WriteLine($"\n---[ {recipe.RecipeName} ]---");
-                
-                foreach (var ingredient in recipe.RecipeIngredients) {
-                    Console.WriteLine($"- {ingredient.Quantity} {ingredient.Name}");
-                }
-
+                Console.WriteLine($"'{recipe.RecipeName}' recipe has been created successfully!\n");
+                Console.WriteLine(recipe);
                 return;
             } 
             else {

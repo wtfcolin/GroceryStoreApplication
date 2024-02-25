@@ -76,10 +76,10 @@ public class User {
             Console.WriteLine("There are currently 0 items on your recipe list...");
         } else {
             foreach (var recipe in RecipeList) {
-                Console.WriteLine($"\n--[ {recipe.RecipeName} ]--");
+                Console.WriteLine($"\n---[ {recipe.RecipeName} ]---");
 
                 foreach (var ingredient in recipe.RecipeIngredients) {
-                    Console.WriteLine($"- {ingredient.Quantity} {ingredient.Name}");
+                    Console.WriteLine($"* {ingredient.Quantity} {ingredient.Name}");
                 }
             }
         }
