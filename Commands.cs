@@ -319,13 +319,22 @@ public static class Commands {
         string name = Console.ReadLine();
 
         foreach (var recipe in user.RecipeList) {
-            if (name.Replace("_"," ").ToLower() == recipe.RecipeName.ToLower()) {
-                user.RecipeList.Remove(recipe);
+            try {
+                if (name == recipe.RecipeName) {
+                    user.RecipeList.Remove(recipe);
+                    ClearTerminal();
+                    Console.WriteLine($"Recipe '{recipe.RecipeName}' has been removed successfully!");
+                    return;
+                }
+            } catch {
+                ClearTerminal();
+                Console.WriteLine("[!] Invalid syntax! ({recipename})");
                 return;
             }
-
-            Console.WriteLine($"[!] There is no recipe with the name '{name}'!");
-            return;
         }
+
+        ClearTerminal();
+        Console.WriteLine($"[!] There is no recipe with the name '{name}' in your list!");
+        return;
     }
 }

@@ -14,10 +14,10 @@ public class Recipe {
         string ingredientsList = "";
 
         foreach (Item ingredient in RecipeIngredients) {
-            ingredientsList += $"* {ingredient.Quantity} {ingredient.Name}\n";    
+            ingredientsList += $"\t\t* {ingredient.Quantity} {ingredient.Name}\n";    
         }
 
-        return $"==============[ Recipe Information ]==============\nName:\t{RecipeName}\nIngredients:\n{ingredientsList}\n==================================================";
+        return $"==============[ Recipe Information ]==============\nName:\t\t{RecipeName}\nIngredients:\n{ingredientsList}\n==================================================";
     }
 
     /*  Recipe properties

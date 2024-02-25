@@ -96,9 +96,9 @@ public class Store {
 
         Console.WriteLine($"\tItems in cart: {Cart.Count}  ({subtotal:$#,##0.00})");
         Console.WriteLine($"\tRemaining Balance: {userBalance - subtotal:$#,##0.00}\n");
-        Console.WriteLine($"> Name: {userName}");
-        Console.WriteLine($"> Age: {userAge}");
-        Console.WriteLine($"> Balance: {userBalance:$#,##0.00}\n");
+        Console.WriteLine($"\t> Name: {userName}");
+        Console.WriteLine($"\t> Age: {userAge}");
+        Console.WriteLine($"\t> Balance: {userBalance:$#,##0.00}\n");
         Console.WriteLine("==================================================");
         return;
     }
