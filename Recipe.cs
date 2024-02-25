@@ -12,12 +12,14 @@ public class Recipe {
 
     public override string ToString() {
         string ingredientsList = "";
+        int totalCalories = 0;
 
         foreach (Item ingredient in RecipeIngredients) {
-            ingredientsList += $"\t\t* {ingredient.Quantity} {ingredient.Name}\n";    
+            ingredientsList += $"\t\t* {ingredient.Quantity} {ingredient.Name}\n";
+            totalCalories += ingredient.Calories * ingredient.Quantity;
         }
 
-        return $"==============[ Recipe Information ]==============\nName:\t\t{RecipeName}\nIngredients:\n{ingredientsList}\n==================================================";
+        return $"==============[ Recipe Information ]==============\nName:\t\t{RecipeName}\nCalories:\t{totalCalories}\nIngredients:\n{ingredientsList}\n==================================================";
     }
 
     /*  Recipe properties

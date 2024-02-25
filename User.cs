@@ -75,9 +75,14 @@ public class User {
         if (RecipeList.Count == 0) {
             Console.WriteLine("There are currently 0 items on your recipe list...");
         } else {
+            int totalCalories = 0;
             foreach (var recipe in RecipeList) {
                 Console.WriteLine($"\n---[ {recipe.RecipeName} ]---");
+                foreach (var ingredient in recipe.RecipeIngredients) {
+                    totalCalories += ingredient.Calories * ingredient.Quantity;
+                }
 
+                Console.WriteLine($"Calories: {totalCalories}");
                 foreach (var ingredient in recipe.RecipeIngredients) {
                     Console.WriteLine($"* {ingredient.Quantity} {ingredient.Name}");
                 }

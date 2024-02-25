@@ -5,11 +5,11 @@ public static class Commands {
     /*  Function to handle user input
     */
     public static bool CommandLine(User user, Store store) {
-        Console.WriteLine("\n==================================================");
+        Console.WriteLine("\n__________________________________________________");
         Console.Write(">> ");
         string command = Console.ReadLine(); // Get the user input
         string[] arguments = command.Split(' '); // Split the input by spaces to get the arguments
-        Console.WriteLine("\n==================================================");
+        Console.WriteLine("\n__________________________________________________");
         ClearTerminal();
         return Command(arguments, user, store);
     }
@@ -98,7 +98,7 @@ public static class Commands {
             case "exit":
             return false;
 
-            case "admin123":
+            case $"admin123":
             if (user.Admin) {
                 Console.WriteLine("ADMINISTRATOR MODE: DISABLED");
                 user.Admin = false;
@@ -242,15 +242,16 @@ public static class Commands {
 
         ClearTerminal();
         Console.WriteLine("What is the name of your recipe?");
-        Console.WriteLine("==================================================");
+        Console.WriteLine("__________________________________________________");
         Console.Write(">> ");
         string name = Console.ReadLine();
         ClearTerminal();
 
         while (toggle) {
-            Console.WriteLine("\nPlease enter an ingredient name and amount seperated by a space (Ex: Burger_Patty 2, Apple 4, ...)");
+            Console.WriteLine("\nPlease enter an ingredient name and amount ({item name} {amount})");
             Console.WriteLine("When you are finished adding ingredients, type 'done'.");
-            Console.WriteLine("==================================================");
+            Console.WriteLine("\t- 'look' and 'search {item name}' can still be used");
+            Console.WriteLine("__________________________________________________");
             Console.Write(">> ");
             string command = Console.ReadLine();
             string[] arguments = command.Split(" ");
@@ -258,25 +259,24 @@ public static class Commands {
             if (arguments.Length > 1) {
                 try {
                     int count = 0;
-                    foreach (var storeItem in store.Inventory) {
-                        if (arguments[0].Replace("_", " ").ToLower() == storeItem.Name.ToLower()) {
+                    foreach (var item in store.Inventory) {
+                        if (arguments[1].Replace("_", " ").ToLower() == item.Category.ToLower()) {
                             ClearTerminal();
-                            Console.WriteLine($"Added {arguments[1]} {storeItem.Name} to your '{name}' recipe!");
-                            storeItem.Quantity = int.Parse(arguments[1]);
-                            ingredients.Add(storeItem);      
-                            count++;
+                            store.SearchStore(arguments[1], true);
+                            return;
                         }
                     }
 
                     if (count == 0) {
                         ClearTerminal();
-                        Console.WriteLine("[!] Invalid syntax! ({item name} {quantity})");
+                        store.SearchStore(arguments[1], false);
                     }
                 } catch {
                     ClearTerminal();
-                    Console.WriteLine("[!] Invalid syntax! ({item name} {quantity})");
+                    Console.WriteLine("[!] Invalid syntax! (search {item name})");
                 }
             } else if (arguments[0] == "look") {
+                ClearTerminal();
                 store.ViewStore();
             } else if (arguments[0] == "search" /* NEEDS FIXING */) {
                 try {
@@ -314,7 +314,7 @@ public static class Commands {
     public static void RemoveRecipe(User user) {
         ClearTerminal();
         Console.WriteLine("What is the name of your recipe?");
-        Console.WriteLine("==================================================");
+        Console.WriteLine("__________________________________________________");
         Console.Write(">> ");
         string name = Console.ReadLine();
 
