@@ -44,16 +44,16 @@ public class Program {
                 double price = double.Parse(cols[3]);
                 int calories = int.Parse(cols[4]);
 
-                Item item = new Item(name, quantity, category, price, calories);
+                Item item = new(name, quantity, category, price, calories);
                 inventory.Add(item);
             }
-
-            Store store = new Store(storeID, storeName, storeAddress, storeBalance, 0.15, inventory);
+            
+            Store store = new(storeID, storeName, storeAddress, storeBalance, 0.15, inventory);
             return store;
         } catch {
             ClearTerminal();
             Console.WriteLine("[!] Loading items was unsuccessful, check the syntax of the CSV file!");
-            Store store = new Store("NONE", 0);
+            Store store = new(0, "NULL", "NULL", 0.0, 0.15, new());
             return store;
         }
     }
@@ -81,7 +81,7 @@ public class Program {
         User user = new User(name, age, balance, cart, false, groceryList);
         */
 
-        User user = new User("Colin", 22, 1000.0, cart, false, groceryList, recipeList);
+        User user = new("Colin", 22, 1000.0, cart, false, groceryList, recipeList);
         Store store = LoadStore(path);
 
         ClearTerminal();

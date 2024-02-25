@@ -7,7 +7,6 @@ public class Item {
     private double price; // Price for the item item (per 1)
     private int calories; // Calories for the item item (per 1)
     
-    // Constructor for 'Food' object
     public Item(string name, int quantity, string category, double price, int calories) {
         Name = name;
         Quantity = quantity;
@@ -16,7 +15,8 @@ public class Item {
         Calories = calories;
     }
     
-    // Override function that shows information about the item
+    /*  Override function that shows information about the item
+     */
     public override string ToString() {
         if (Name.Length > 16) {
             return $"- {Name} ({Quantity})\t\t\t|\t Price: {Price:$#,##0.00}\t|\tCategory: {Category}\t|\tCalories: {Calories}";
@@ -27,6 +27,8 @@ public class Item {
         }
     }
     
+    /*  Item properties
+     */
     public string Name {
         get => name;
         set {

@@ -20,27 +20,36 @@ public class User {
         RecipeList = recipeList;
     }
 
-    // Override function that displays information about the user (can be seen using 'me' command)
+    /* Override function that displays information about the user (can be seen using 'me' command)
+     */
     public override string ToString() {
-        return $"---[ Your Information ]---\nAge:\t\t{Age}\nBalance:\t{UserBalance:$#,##0.00}\nAdmin:\t\t{Admin}\n--------------------------";
+        return $"===============[ Your Information ]===============\nAge:\t\t{Age}\nBalance:\t{UserBalance:$#,##0.00}\nAdmin:\t\t{Admin}\n==================================================";
     }
 
-    // Function that allows the user to view their current balance subtracted by the current items in their cart
-    public void ViewBalance() {
-        Console.WriteLine("---[ Your Balance ]---");
+    /* Function that allows the user to view their current balance subtracted by the current items in their cart
+     */
+    public void ViewBalance(double taxRate) {
+        Console.WriteLine("=================[ Your Balance ]=================");
         Console.WriteLine($"Current Balance:\t{UserBalance:$#,##0.00}");
 
-        double total = 0.00;
+        double subtotal = 0.00;
         foreach (var item in Cart) {
-            total += item.Price;
+            subtotal += item.Price * item.Quantity;
         }
+
+        double tax = subtotal * taxRate;
+        double newBalance = subtotal + tax;
         
-        Console.WriteLine($"Cart Running Total:\t{total:$#,##0.00}");
-        Console.WriteLine($"New Balance:\t\t{UserBalance - total:$#,##0.00}");
-        Console.WriteLine("--------------------------");
+        Console.WriteLine($"\nCart Subtotal:\t\t{subtotal:$#,##0.00}");
+        Console.WriteLine($"Tax:\t\t\t{tax:$#,##0.00}");
+        Console.WriteLine($"\t\t      + __________");
+        Console.WriteLine($"Current Total:\t\t{newBalance:$#,##0.00}");
+        Console.WriteLine($"\nNew Balance:\t\t{UserBalance - newBalance:$#,##0.00} (-{newBalance:$#,##0.00})");
+        Console.WriteLine("==================================================");
     }
 
-    // Function that allows the user to view the current Food objects inside the cart list
+    /* Function that allows the user to view the current Food objects inside the cart list
+     */
     public void ViewCart() {
         int counter = 0;
         Console.WriteLine("==================[ Your Cart ]===================");
@@ -58,7 +67,29 @@ public class User {
         return;
     }
 
-    // Function that allows the user to view the current Food objects inside the groceryStore list
+    /* Function that allows the user to view their current recipes
+     */
+    public void ViewRecipes() {
+        Console.WriteLine("===============[ Your Recipe List ]===============");
+
+        if (RecipeList.Count == 0) {
+            Console.WriteLine("There are currently 0 items on your recipe list...");
+        } else {
+            foreach (var recipe in RecipeList) {
+                Console.WriteLine($"\n--[ {recipe.RecipeName} ]--");
+
+                foreach (var ingredient in recipe.RecipeIngredients) {
+                    Console.WriteLine($"- {ingredient.Quantity} {ingredient.Name}");
+                }
+            }
+        }
+
+        Console.WriteLine("==================================================");
+        return;
+    }
+
+    /* Function that allows the user to view the current Food objects inside the groceryStore list
+     */
     public void ViewList() {
         Console.WriteLine("==============[ Your Grocery List ]===============");
 
@@ -73,7 +104,9 @@ public class User {
         Console.WriteLine("==================================================");
         return;
     }
-    // Function that allows the user to add items into their cart
+    
+    /* Function that allows the user to add items into their cart
+     */
     public void AddItem(string itemName, int amount, Store store) {
         bool storeItemExists = false;
 
@@ -111,12 +144,14 @@ public class User {
         }
 
         if (!storeItemExists) {
-            Console.WriteLine($"[!] This store does not have any '{itemName.Replace("_", " ")}' or it is out of stock!");
+            Console.WriteLine($"[!] This store does not have any '{itemName.Replace("_", " ")}'!");
         }
 
         return;
     }
-    // Function that allows the user to remove items from their cart
+    
+    /* Function that allows the user to remove items from their cart
+     */
     public void RemoveItem(string item, int amount, Store store) {
         bool storeItemExists = false;
 
@@ -152,6 +187,8 @@ public class User {
         return;
     }
 
+    /*  User properties
+     */
     public string Name {
         get => name;
         set {

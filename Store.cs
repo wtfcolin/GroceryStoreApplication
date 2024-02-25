@@ -9,8 +9,7 @@ public class Store {
     private double storeBalance; // Balance of the store
     private double taxRate; // Tax rate for checkout functions and pricing calculations
     private readonly List<Item> inventory; // Inventory for the stores with 'Item' objects
-    
-    // Constructor for 'Store' object
+ 
     public Store(int storeID, string storeName, string storeAddress, double storeBalance, double taxRate, List<Item> inventory) {
         StoreID = storeID;
         StoreName = storeName;
@@ -20,18 +19,14 @@ public class Store {
         this.inventory = inventory;
     }
 
-    // Overflow constructor incase some values are null in objects from the file
-    public Store(string storeName, double storeBalance) {
-        StoreName = storeName;
-        StoreBalance = storeBalance;
-    }
-
-    // Override function that displays information about the store (can be seen with 'store' command)
+    /* Override function that displays information about the store (can be seen with 'store' command)
+     */
     public override string ToString() {
-        return $"--------------[ Store Information ]---------------\nName: {StoreName}\nBalance: {StoreBalance:$#,##0.00}\n--------------------------------------------------";
+        return $"==============[ Store Information ]===============\nName:\t\t{StoreName}\nBalance:\t{StoreBalance:$#,##0.00}\n==================================================";
     }
 
-    // Function that allows the user to view the store's inventory (can be seen with 'look' command)
+    /*  Function that allows the user to view the store's inventory (can be seen with 'look' command)
+     */
     public void ViewStore() {
         List<string> categories = new();
         Console.WriteLine("===============[ Store Inventory ]================");
@@ -50,24 +45,46 @@ public class Store {
         return;
     }
 
-    // Function that allows the user to look up a specific item based on the item's name (can be seen with 'search [item]' command)
-    public void SearchStore(string item) {
+    /*  Function that allows the user to look up a specific item based on the item's name (can be seen with 'search [item]' command)
+     */
+    public void SearchStore(string item, bool searchCategory) {
+        int count = 0;
         Console.WriteLine("================[ Search Results ]================");
-        Console.WriteLine($"Search Term... {item}\n");
 
         foreach (var storeItem in Inventory) {
-            if (storeItem.Name.ToLower() == item.Replace("_", " ").ToLower()) {
-                Console.WriteLine($"- {storeItem.Name} ({storeItem.Quantity}) | {storeItem.Category} | {storeItem.Price:$#,##0.00}/item | {storeItem.Calories} calories");
-                Console.WriteLine("==================================================");
-                return;
+            bool matchedItem = storeItem.Name.ToLower().Contains(item.Replace("_", " ").ToLower());
+            bool matchedCategory = storeItem.Category.ToLower().Contains(item.Replace("_", " ").ToLower());
+            
+            if (searchCategory) {
+                if (matchedCategory) {
+                    Console.WriteLine($"- {storeItem.Name} ({storeItem.Quantity}) | {storeItem.Price:$#,##0.00}/item | {storeItem.Calories} calories");
+                    count++;
+                }
+            } else {
+                if (matchedItem) {
+                    Console.WriteLine($"- {storeItem.Name} ({storeItem.Quantity}) | {storeItem.Category} | {storeItem.Price:$#,##0.00}/item | {storeItem.Calories} calories");
+                    count++;
+                }
             }
         }
-        Console.WriteLine($"There were 0 results for '{item}'...");
-        Console.WriteLine("==================================================");
+
+        if (count > 0) {
+            if (searchCategory) {
+                Console.WriteLine($"\nReturned {count} results for category '{item}'...");
+            } else {
+                Console.WriteLine($"\nReturned {count} results for '{item}'...");
+            }
+            Console.WriteLine("==================================================");
+        } else {
+            Console.WriteLine($"There were 0 results for '{item}'...");
+            Console.WriteLine("==================================================");
+        }
+
         return;
     }
 
-    // Function that greets the user once they first open the program after short questioning
+    /*  Function that greets the user once they first open the program after short questioning
+     */
     public void Greeting(string userName, double userBalance, int userAge, List<Item> Cart) {
         Console.WriteLine("=========[ Grocery Shopping Application ]=========\n");
         Console.WriteLine($"\tYou are shopping at...  {StoreName}\n");
@@ -86,16 +103,29 @@ public class Store {
         return;
     }
 
-    // Function that handles the printing of the receipt and calculating total cost
-    public void CheckOut(User user) {
+    /*  Function that handles the printing of the receipt and calculating total cost
+     */
+    public bool CheckOut(User user) {
+        double cartTotal = 0;
+        foreach (var cartItem in user.Cart) {
+            cartTotal += cartItem.Price * cartItem.Quantity + (cartItem.Price * cartItem.Quantity * TaxRate);
+        }
+        
+        if (user.UserBalance - cartTotal < 0) {
+            Console.WriteLine("[!] Invalid balance! You do not have enough money to checkout!");
+            return true;
+        }
+        
         Random randomNumber = new();
-        int storeID = randomNumber.Next(10000000);
-        string path = $"reciept-{randomNumber.Next(1000000)}.txt";
+
+        int recieptID = randomNumber.Next(10000000);
+        string path = $"reciept-{recieptID}.txt";
         using StreamWriter writer = new(path);
 
         Console.WriteLine($"===========[ Reciept For {storeName} ]============");
         Console.WriteLine($"\t{StoreName.ToUpper()}");
-        Console.WriteLine($"\tSTORE ID # {StoreID}\n");
+        Console.WriteLine($"\tSTORE ID # {StoreID}");
+        Console.WriteLine($"\tRECIEPT ID # {recieptID}");
         Console.WriteLine($"\t{StoreAddress.ToUpper()}");
         Console.WriteLine($"\tTEL: +{randomNumber.Next(1000)}-{randomNumber.Next(1000)}-{randomNumber.Next(10000)}");
         Console.WriteLine($"--------------------------------------------------");
@@ -103,6 +133,7 @@ public class Store {
         Console.WriteLine($"MANAGER:\t\t\tJOHN JAMESON");
         Console.WriteLine($"--------------------------------------------------\n");
         Console.WriteLine($"NAME\t\t\tQTY\tPRICE\n");
+        
         writer.WriteLine("===========[ Transaction Information ]============");
         writer.WriteLine($"\t{StoreName.ToUpper()}");
         writer.WriteLine($"\tSTORE ID # {StoreID}\n");
@@ -155,9 +186,11 @@ public class Store {
         writer.WriteLine("Glad to see you again!");
         writer.WriteLine("==================================================");
 
-        return;
+        return false;
     }
     
+    /*  Store properties
+     */
     public int StoreID {
         get => storeID;
         set {

@@ -4,10 +4,7 @@ using System.Collections.Generic;
 public class Recipe {
     private string recipeName;
     private List<Item> recipeIngredients;
-    /*
-     * Constructor for 'Recipe' object
-     * 
-     */
+    
     public Recipe(string recipeName, List<Item> ingredients) {
         RecipeName = recipeName;
         RecipeIngredients = ingredients;
@@ -23,6 +20,8 @@ public class Recipe {
         return $"---[ Recipe Information ]---\nName: {RecipeName}\nIngredients:\n{ingredientsList}";
     }
 
+    /*  Recipe properties
+     */
     public string RecipeName {
         get => recipeName;
         set {

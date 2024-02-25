@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 
 public static class Commands {
-    // Function to handle user input
+    /*  Function to handle user input
+    */
     public static bool CommandLine(User user, Store store) {
         Console.WriteLine("\n==================================================");
         Console.Write(">> ");
@@ -12,46 +13,39 @@ public static class Commands {
         ClearTerminal();
         return Command(arguments, user, store);
     }
-    // Function that is used by other functions / used to clear the screen (can be seen using 'clear' command)
+    
+    /*  Function that is used by other functions / used to clear the screen (can be seen using 'clear' command)
+    */
     public static void ClearTerminal() {
         for (int i = 0; i < 30; i++) {
             Console.WriteLine("\n");
         }
     }
 
-    // Internal function used to handle user input arguments
+    /*  Internal function used to handle user input arguments
+    */
     private static bool Command(string[] arguments, User user, Store store) {
         switch (arguments[0]) {
             case "set":
-            if (arguments.Length > 1) {
-                if (arguments[1] == "name") {
-                    SetValue(arguments[1], arguments[2], user, store);
-                } else if ((arguments[1] == "age" && arguments[2].GetType() == typeof(int))|| (arguments[1] == "balance" && arguments[2].GetType() == typeof(int))) {
-                    SetValue(arguments[1], double.Parse(arguments[2]), user, store);
-                } else {
-                    Console.WriteLine("[!] Invalid syntax! (set {option} {value})");
-                }
-            } else {
+            try {
+                SetValue(arguments[1], arguments[2], user, store);
+            } catch {
                 Console.WriteLine("[!] Invalid syntax! (set {option} {value})");
             }
             return true;
 
             case "add":
-            if (arguments.Length > 1) {
+            try {
                 user.AddItem(arguments[1], int.Parse(arguments[2]), store);
-            } else {
+            } catch {
                 Console.WriteLine("[!] Invalid syntax! (add {item name} {amount})");
             }
             return true;
 
             case "remove":
-            if (arguments.Length > 1) {
-                if (arguments[2].GetType() == typeof(int)) {
-                    user.RemoveItem(arguments[1], int.Parse(arguments[2]), store);
-                } else {
-                    Console.WriteLine("[!] Invalid syntax! (remove {item name} {amount}");
-                }
-            } else {
+            try {
+                user.RemoveItem(arguments[1], int.Parse(arguments[2]), store);
+            } catch {
                 Console.WriteLine("[!] Invalid syntax! (remove {item name} {amount}");
             }
             return true;
@@ -69,13 +63,23 @@ public static class Commands {
             return true;
 
             case "balance":
-            user.ViewBalance();
+            user.ViewBalance(store.TaxRate);
             return true;
 
             case "search":
-            if (arguments.Length > 1) {
-                store.SearchStore(arguments[1]);
-            } else {
+            try {
+                int count = 0;
+                foreach (var item in store.Inventory) {
+                    if (arguments[1].Replace("_", " ").ToLower() == item.Category.ToLower()) {
+                        store.SearchStore(arguments[1], true);
+                        return true;
+                    }
+                }
+
+                if (count == 0) {
+                    store.SearchStore(arguments[1], false);
+                }
+            } catch {
                 Console.WriteLine("[!] Invalid syntax! (search {item name})");
             }
             return true;
@@ -89,22 +93,27 @@ public static class Commands {
             return true;
 
             case "checkout":
-            store.CheckOut(user);
-            return false;
+            return store.CheckOut(user);
 
             case "exit":
             return false;
 
             case "admin123":
             if (user.Admin) {
+                Console.WriteLine("ADMINISTRATOR MODE: DISABLED");
                 user.Admin = false;
             } else {
+                Console.WriteLine("ADMINISTRATOR MODE: ENABLED");
                 user.Admin = true;
             }
             return true;
 
+            case "recipes":
+            user.ViewRecipes();
+            return true;
+
             case "createrecipe":
-            CreateRecipe(store, user);
+            CreateRecipe(store, user, true);
             return true;
 
             case "removerecipe":
@@ -129,7 +138,8 @@ public static class Commands {
         }
     }
 
-    // Prints the help menu that displays a list of commands
+    /*  Prints the help menu that displays a list of commands
+    */
     private static void PrintHelp(bool ADMIN) {
         Console.WriteLine("===============[ List Of Commands ]===============");
         Console.WriteLine("- help = Displays a list of commands");
@@ -164,98 +174,151 @@ public static class Commands {
         return;
     }
     
-    // Sets the values for user age, user balance, and store balance (ADMIN)
-    private static void SetValue(string option, double amount, User user, Store store) {
-        if (string.IsNullOrEmpty(option)) {
-            Console.WriteLine("[!] Invalid option! Please provide a valid option.");
-            return;
-        } else if (amount.GetType() != typeof(double)) {
-            Console.WriteLine("[!] Invalid amount! Please provide a valid amount.");
-            return;
-        }
-
-        if (user.Admin == true) {
-            if (option == "age") {
-                user.Age = (int)amount;
-            } else if (option == "balance") {
-                user.UserBalance = amount;
+    /* Sets the values for user age, user balance, and store balance (ADMIN)
+    */
+    private static void SetValue(string option, string value, User user, Store store) {
+        if (user.Admin) {
+            if (option == "name") {
+                if (!string.IsNullOrWhiteSpace(value)) {
+                    Console.WriteLine($"You name was updated from '{user.Name}' to '{value}'");
+                    user.Name = value;
+                } else {
+                    Console.WriteLine("[!] Invalid name! Name must be a non-empty string.");
+                }
+            } else if (option == "age") {
+                const int MAXUSERAGE = 110; 
+                try {
+                    if (int.Parse(value) >= 1 && int.Parse(value) <= MAXUSERAGE) {
+                        Console.WriteLine($"Your age was updated from '{user.Age}' to '{value}'!");
+                        user.Age = int.Parse(value);
+                    } else {
+                        Console.WriteLine($"[!] Invalid age! Age must be between 1 - {MAXUSERAGE}.");
+                        return;
+                    }
+                } catch {
+                    Console.WriteLine("[!] Invalid age! Age must be an integer.");
+                }
+            } 
+            else if (option == "balance") {
+                const double MAXUSERBALANCE = 1000000.0;
+                try {
+                    if (double.Parse(value) >= 1 && double.Parse(value) <= MAXUSERBALANCE) {
+                        Console.WriteLine($"Your balance was updated from '{user.UserBalance:$#,##0.00}' to '{double.Parse(value):$#,##0.00}'!");
+                        user.UserBalance = double.Parse(value);
+                    } else {
+                        Console.WriteLine($"[!] Invalid balance! Balance must be between 1 - {MAXUSERBALANCE}.");
+                        return;
+                    }
+                } catch {
+                    Console.WriteLine("[!] Invalid balance ! Balance must be an double.");
+                }
             } else if (option == "storebalance") {
-                store.StoreBalance = amount;
+                const double MAXSTOREBALANCE = 100000000.0;
+                try {
+                    if (double.Parse(value) >= 1 && double.Parse(value) <= MAXSTOREBALANCE) {
+                        Console.WriteLine($"The store balance was updated from '{store.StoreBalance:$#,##0.00}' to '{double.Parse(value):$#,##0.00}'!");
+                        store.StoreBalance = double.Parse(value);
+                    } else {
+                        Console.WriteLine($"[!] Invalid store balance! Store balance must be between 1 - {MAXSTOREBALANCE}.");
+                        return;
+                    }
+                } catch {
+                    Console.WriteLine("[!] Invalid store balance! Store balance must be a double.");
+                }
+            } else {
+                Console.WriteLine("[!] Invalid option! Please provide a valid option.");
+                return;
             }
         } else {
             Console.WriteLine("[!] You do not have proper permissions to access this command!");
             return;
         }
     }
-    
-    // Sets the values for user name (ADMIN)
-    private static void SetValue(string option, string value, User user, Store store) {
-        if (string.IsNullOrEmpty(option)) {
-            Console.WriteLine("[!] Invalid option! Please provide a valid option.");
-            return;
-        } else if (value.GetType() != typeof(double)) {
-            Console.WriteLine("[!] Invalid amount! Please provide a valid amount.");
-            return;
-        }
 
-        if (user.Admin == true) {
-            if (option == "name") {
-                user.Name = value;
-            } 
-        } else {
-            Console.WriteLine("[!] You do not have proper permissions to access this command!");
-            return;
-        }
-    }
-
-    // Creates a recipe for the user and appends it to their personal recipe list
-    public static void CreateRecipe(Store store, User user) {
-        for (int i = 0; i < 30; i++) {
-            Console.WriteLine("\n");
-        }
-
+    /*  Creates a recipe for the user and appends it to their personal recipe list
+    */
+    public static void CreateRecipe(Store store, User user, bool toggle) {
+        ClearTerminal();
         Console.WriteLine("What is the name of your recipe?");
-        Console.WriteLine("--------------------------------------------------");
+        Console.WriteLine("==================================================");
         Console.Write(">> ");
         string name = Console.ReadLine();
-        bool toggle = true;
+
+        ClearTerminal();
 
         while (toggle) {
-            for (int i = 0; i < 30; i++) {
-                Console.WriteLine("\n");
-            }
-
-            Console.WriteLine("Please enter an ingredient name and amount seperated by a space (Ex: Burger_Patty 2, Apple 4, ...)");
+            Console.WriteLine("\nPlease enter an ingredient name and amount seperated by a space (Ex: Burger_Patty 2, Apple 4, ...)");
             Console.WriteLine("When you are finished adding ingredients, type 'done'.");
-            Console.WriteLine("--------------------------------------------------");
+            Console.WriteLine("==================================================");
             Console.Write(">> ");
             string command = Console.ReadLine();
             string[] arguments = command.Split(" ");
             List<Item> ingredients = new();
 
-            if (arguments[0].GetType() == typeof(string) && arguments[1].GetType() == typeof(int)) {
-                foreach (var storeItem in store.Inventory) {
-                    if (arguments[0].Replace("_", " ").ToLower() == storeItem.Name.ToLower() && storeItem.Quantity >= int.Parse(arguments[1])) {
-                        storeItem.Quantity = int.Parse(arguments[2]);
-                        ingredients.Add(storeItem);
+
+            if (arguments.Length > 1) {
+                try {
+                    int count = 0;
+                    foreach (var storeItem in store.Inventory) {
+                        if (arguments[0].Replace("_", " ").ToLower() == storeItem.Name.ToLower()) {
+                            ClearTerminal();
+                            Console.WriteLine($"Added {arguments[1]} {storeItem.Name} to your '{name}' recipe!");
+                            storeItem.Quantity = int.Parse(arguments[1]);
+                            ingredients.Add(storeItem);
+                            count++;
+                        }
                     }
+
+                    if (count == 0) {
+                        ClearTerminal();
+                        Console.WriteLine("[!] Invalid syntax! ({item name} {quantity})");
+                    }
+                } catch {
+                    ClearTerminal();
+                    Console.WriteLine("[!] Invalid syntax! ({item name} {quantity})");
+                }
+            } else if (arguments[0] == "look") {
+                store.ViewStore();
+            } else if (arguments[0] == "search") {
+                try {
+                    int count = 0;
+                    foreach (var item in store.Inventory) {
+                        if (arguments[1].Replace("_", " ").ToLower() == item.Category.ToLower()) {
+                            store.SearchStore(arguments[1], true);
+                            return;
+                        }
+                    }
+
+                    if (count == 0) {
+                        store.SearchStore(arguments[1], false);
+                    }
+                } catch {
+                    Console.WriteLine("[!] Invalid syntax! (search {item name})");
                 }
             } else if (arguments[0] == "done") {
-                Recipe recipe = new Recipe(name, ingredients);
+                ClearTerminal();
+                Recipe recipe = new(name, ingredients);
                 user.RecipeList.Add(recipe);
+                Console.WriteLine($"'{recipe.RecipeName}' recipe has been created successfully!");
+                Console.WriteLine($"\n---[ {recipe.RecipeName} ]---");
+                
+                foreach (var ingredient in recipe.RecipeIngredients) {
+                    Console.WriteLine($"- {ingredient.Quantity} {ingredient.Name}");
+                }
+
                 return;
-            } else {
-                Console.WriteLine("[!] Invalid syntax! You must provide a name and amount seperated by a space (Ex: Burger_Patty 2, Apple 4, ...");
+            } 
+            else {
+                ClearTerminal();
+                Console.WriteLine("[!] Invalid syntax! ({item name} {quantity})");
             }
         }
     }
 
-    // Removes a recipe from the user's personal recipe list
+    /*  Removes a recipe from the user's personal recipe list
+    */
     public static void RemoveRecipe(User user) {
-        for (int i = 0; i < 30; i++) {
-            Console.WriteLine("\n");
-        }
-
+        ClearTerminal();
         Console.WriteLine("What is the name of your recipe?");
         Console.WriteLine("==================================================");
         Console.Write(">> ");
