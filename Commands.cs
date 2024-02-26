@@ -9,7 +9,6 @@ public static class Commands {
         Console.Write(">> ");
         string command = Console.ReadLine(); // Get the user input
         string[] arguments = command.Split(' '); // Split the input by spaces to get the arguments
-        Console.WriteLine("\n__________________________________________________");
         ClearTerminal();
         return Command(arguments, user, store);
     }
@@ -35,28 +34,26 @@ public static class Commands {
             }
             return true;
 
-            case "add":
-            try {
-                user.AddItem(arguments[1], int.Parse(arguments[2]), store);
-            } catch {
-                Console.WriteLine("[!] Invalid syntax! (add {item name} {amount})");
-            }
-            return true;
-
-            case "remove":
-            try {
-                user.RemoveItem(arguments[1], int.Parse(arguments[2]), store);
-            } catch {
-                Console.WriteLine("[!] Invalid syntax! (remove {item name} {amount}");
-            }
-            return true;
-
             case "help":
             PrintHelp(user.Admin);
             return true;
 
             case "cart":
-            user.ViewCart();
+            if (arguments.Length > 1) {
+                try {
+                    if (arguments[1] == "add") {
+                        user.AddCartItem(arguments[2], int.Parse(arguments[3]), store);
+                    } else if (arguments[1] == "remove") {
+                        user.RemoveCartItem(arguments[2], int.Parse(arguments[3]), store);
+                    } else {
+                        Console.WriteLine("[!] Invalid syntax! (cart [add/remove {item name} {amount}])");
+                    }
+                } catch {
+                    Console.WriteLine("[!] Invalid syntax! (cart [add/remove {item name} {amount}])");
+                }
+            } else {
+                user.ViewCart();
+            }
             return true;
 
             case "look":
@@ -86,7 +83,21 @@ public static class Commands {
             return true;
 
             case "list":
-            user.ViewList();
+            if (arguments.Length > 1) {
+                try {
+                    if (arguments[1] == "add") {
+                        user.AddListItem(arguments[2], int.Parse(arguments[3]), store);
+                    } else if (arguments[1] == "remove") {
+                        user.RemoveListItem(arguments[2], int.Parse(arguments[3]));
+                    } else {
+                        Console.WriteLine("[!] Invalid syntax! (cart [add/remove {item name} {amount}])");
+                    }
+                } catch {
+                    Console.WriteLine("[!] Invalid syntax! (cart [add/remove {item name} {amount}])");
+                }
+            } else {
+                user.ViewList();
+            }
             return true;
 
             case "clear":
@@ -113,12 +124,16 @@ public static class Commands {
             user.ViewRecipes();
             return true;
 
-            case "createrecipe":
-            CreateRecipe(store, user, true);
-            return true;
-
-            case "removerecipe":
-            RemoveRecipe(user);
+            case "recipe":
+            try {
+                if (arguments[1] == "create") {
+                    CreateRecipe(store, user, true);
+                } else if (arguments[1] == "remove") {
+                    RemoveRecipe(user);
+                }
+            } catch {
+                Console.WriteLine("[!] Invalid syntax! (recipe [create/remove])");
+            }
             return true;
 
             case "me":
@@ -143,21 +158,20 @@ public static class Commands {
     */
     private static void PrintHelp(bool ADMIN) {
         Console.WriteLine("===============[ List Of Commands ]===============");
+        Console.WriteLine("\t{}: Required Args, []: Optional Args\n");
+
         Console.WriteLine("- help = Displays a list of commands");
         Console.WriteLine("- exit = Exits the program\n");
 
-        Console.WriteLine("- list = Prints out your grocery list");
-        Console.WriteLine("- cart = Prints out the items in your cart");
-        Console.WriteLine("- add [item] [amount] = Adds a food item to your cart");
-        Console.WriteLine("- remove [item] [amount] = Removes a food item from your cart");
+        Console.WriteLine("- list [add/remove {item name}] = Print, add, and remove items from your grocery list");
+        Console.WriteLine("- cart [add/remove {item name}]= Print, add, and remove items from your cart");
         Console.WriteLine("- checkout = Prints a receipt of your items if all the conditions are satisfied\n");
 
         Console.WriteLine("- look = Lists all the items that the store has and their quantity");
-        Console.WriteLine("- search [item] = Prints out information about a specific item\n");
+        Console.WriteLine("- search {item name/category} = Prints out information about a specific item\n");
 
         Console.WriteLine("- recipes = Prints out your recipe list");
-        Console.WriteLine("- createrecipe = Asks you questions to create a recipe");
-        Console.WriteLine("- removerecipe = Removes a recipe from your personal recipe list\n");
+        Console.WriteLine("- recipe {create/remove} = Prints out recipe or create and remove recipes\n");
 
         Console.WriteLine("- balance = Prints out your current balance");
         Console.WriteLine("- store = Prints out information about the current store");
@@ -171,7 +185,6 @@ public static class Commands {
         } else {
             Console.WriteLine("==================================================");
         }
-
         return;
     }
     
@@ -284,6 +297,9 @@ public static class Commands {
                 user.RecipeList.Add(recipe);
                 Console.WriteLine($"'{recipe.RecipeName}' recipe has been created successfully!\n");
                 Console.WriteLine(recipe);
+                foreach (var ingredient in recipe.RecipeIngredients) {
+                    user.GroceryList.Add(ingredient);
+                }
                 return;
             } else if (arguments.Length > 1) {
                 try {
@@ -340,6 +356,11 @@ public static class Commands {
                     user.RecipeList.Remove(recipe);
                     ClearTerminal();
                     Console.WriteLine($"Recipe '{recipe.RecipeName}' has been removed successfully!");
+                    foreach (var ingredient in recipe.RecipeIngredients) {
+                        if (user.GroceryList.Contains(ingredient)) {
+                            user.GroceryList.Remove(ingredient);
+                        }
+                    }
                     return;
                 }
             } catch {

@@ -14,7 +14,7 @@ public class Item {
         Price = price;
         Calories = calories;
     }
-    
+
     /*  Override function that shows information about the item
      */
     public override string ToString() {

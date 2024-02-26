@@ -102,17 +102,86 @@ public class User {
             Console.WriteLine("There are currently 0 items on your grocery list...");
         } else {
             foreach (var listItem in GroceryList) {
-                Console.WriteLine($"- {listItem.Quantity} {listItem.Name}");
+                bool listItemFulfilled = false;
+                foreach (var cartItem in Cart) {
+                    if (listItem.Name == cartItem.Name && cartItem.Quantity >= listItem.Quantity) {
+                        listItemFulfilled = true;
+                    }
+                }
+
+                if (!listItemFulfilled) {
+                    Console.WriteLine($"[ ] {listItem.Quantity} {listItem.Name}");
+                } else {
+                    Console.WriteLine($"[X] {listItem.Quantity} {listItem.Name}");
+                }
             }
         }
 
         Console.WriteLine("==================================================");
         return;
     }
-    
+
+    /* Function that allows the user to add items into their grocery list
+     */
+    public void AddListItem(string itemName, int amount, Store store) {
+        bool storeItemExists = false;
+
+        foreach (var storeItem in store.Inventory) {
+            if (itemName.Replace("_", " ").ToLower() == storeItem.Name.ToLower()) {
+                storeItemExists = true;
+                bool listItemExists = false;
+                foreach (var listItem in GroceryList) {
+                    if (itemName.Replace("_", " ").ToLower() == listItem.Name.ToLower()) {
+                        listItemExists = true;
+                        listItem.Quantity += amount;
+                        break;
+                    }
+                }
+
+                if (!listItemExists) {
+                    Item newListItem = new(storeItem.Name, amount, storeItem.Category, storeItem.Price, storeItem.Calories);
+                    GroceryList.Add(newListItem);
+                }
+
+                Console.WriteLine($"{amount} {storeItem.Name} was added to your grocery list!");
+            }
+        }
+
+        if (!storeItemExists) {
+            Console.WriteLine($"[!] This store does not have any '{itemName.Replace("_", " ")}'!");
+        }
+
+        return;
+    }
+
+    /* Function that allows the user to add items into their grocery list
+     */
+    public void RemoveListItem(string itemName, int amount) {
+        bool listItemExists = false;
+
+        foreach (var listItem in GroceryList) {
+            if (itemName.ToLower().Replace("_", " ").ToLower() == listItem.Name.ToLower()) {
+                listItemExists = true;
+                if (amount >= listItem.Quantity) {
+                    GroceryList.Remove(listItem);
+                } else {
+                    listItem.Quantity -= amount;
+                }
+                
+                Console.WriteLine($"{amount} {listItem.Name} was removed to your grocery list!");
+            }
+        }
+
+        if (!listItemExists) {
+            Console.WriteLine($"[!] This store does not have any '{itemName.Replace("_", " ")}'!");
+        }
+
+        return;
+    }
+
     /* Function that allows the user to add items into their cart
      */
-    public void AddItem(string itemName, int amount, Store store) {
+    public void AddCartItem(string itemName, int amount, Store store) {
         bool storeItemExists = false;
 
         foreach (var storeItem in store.Inventory) {
@@ -157,16 +226,16 @@ public class User {
     
     /* Function that allows the user to remove items from their cart
      */
-    public void RemoveItem(string item, int amount, Store store) {
+    public void RemoveCartItem(string itemName, int amount, Store store) {
         bool storeItemExists = false;
 
         foreach (var cartItem in Cart) {
             // For each item in the cart, find item with matching name and quantity is greater than 0
-            if (item.Replace("_", " ").ToLower() == cartItem.Name.ToLower() && cartItem.Quantity > 0) {
+            if (itemName.Replace("_", " ").ToLower() == cartItem.Name.ToLower() && amount > 0) {
                 storeItemExists = true;
                 foreach (var storeItem in store.Inventory) {
                     // For each item in the store inventory, if item matches & current cart quantity is either = or > 0, then proceed with transaction
-                    if (storeItem.Name.ToLower() == item.Replace("_", " ").ToLower()) {
+                    if (storeItem.Name.ToLower() == itemName.Replace("_", " ").ToLower()) {
                         // If the amount being removed is = or > 0, remove the items from cart and add to store inventory
                         if (cartItem.Quantity - amount == 0) {
                             Cart.Remove(cartItem);
@@ -178,7 +247,7 @@ public class User {
                             Console.WriteLine($"{amount} {storeItem.Name} was removed from your cart!");
                         // If the amount is more than what is in the cart, give an error
                         } else {
-                            Console.WriteLine($"[!] You do not have that many '{item.Replace("_", " ")}' in your cart!");
+                            Console.WriteLine($"[!] You do not have that many '{itemName.Replace("_", " ")}' in your cart!");
                         }
                     }
                 }
@@ -186,7 +255,7 @@ public class User {
         }
         // If there are no matching items in the cart, give an error
         if (!storeItemExists) {
-            Console.WriteLine($"[!] There is currently no '{item.Replace("_", " ")}' in your cart!");
+            Console.WriteLine($"[!] There is currently no '{itemName.Replace("_", " ")}' in your cart!");
         }
 
         return;

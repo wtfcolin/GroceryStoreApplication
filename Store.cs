@@ -106,23 +106,34 @@ public class Store {
     /*  Function that handles the printing of the receipt and calculating total cost
      */
     public bool CheckOut(User user) {
-        double cartTotal = 0;
+        // Check if all grocery list items are in cart
         foreach (var listItem in user.GroceryList) {
-            if (!(user.Cart.Contains(listItem))) {
+            bool listCheck = false;
+            foreach (var cartItem in user.Cart) {
+                if (listItem.Name == cartItem.Name && cartItem.Quantity >= listItem.Quantity) {
+                    listCheck = true;
+                }
+            }
 
+            if (!listCheck) {
                 Console.WriteLine("[!] You still have things on your grocery list to pick up!");
+                return true;
             }
         }
 
+        // Sum the subtotal of cart items
+        double cartTotal = 0;
         foreach (var cartItem in user.Cart) {
             cartTotal += cartItem.Price * cartItem.Quantity + (cartItem.Price * cartItem.Quantity * TaxRate);
         }
         
+        // Check if the user has enough money
         if (user.UserBalance - cartTotal < 0) {
             Console.WriteLine("[!] Invalid balance! You do not have enough money to checkout!");
             return true;
         }
         
+        // Generate reciept
         Random randomNumber = new();
 
         int recieptID = randomNumber.Next(10000000);
@@ -152,6 +163,7 @@ public class Store {
         writer.WriteLine($"--------------------------------------------------\n");
         writer.WriteLine($"NAME\t\tQTY\tPRICE\n");
 
+        // If a cart item name is longer than 8 characters, add an extra tab (FORMATTING)
         double subtotal = 0.00;
         foreach (Item cartItem in user.Cart) {
             if (cartItem.Name.Length >= 8) {
@@ -174,10 +186,10 @@ public class Store {
         Console.WriteLine($"TAX ({TaxRate:0%})\t\t{(subtotal * TaxRate):$#,##0.00}");
         Console.WriteLine($"TOTAL\t\t\t{(subtotal + (subtotal * TaxRate)):$#,##0.00}\n");
         Console.WriteLine($"CASH\t\t\t{Math.Ceiling(subtotal + (subtotal * TaxRate)):$#,##0.00}");
-        Console.WriteLine($"CHANGE\t\t\t{(Math.Ceiling(subtotal + (subtotal * TaxRate))) - (subtotal + (subtotal * TaxRate))}\n");
-        Console.WriteLine($"\t# ITEMS SOLD {user.Cart.Count}");
-        Console.WriteLine($"\t{DateTime.Now.Month}/{DateTime.Now.Day}/{DateTime.Now.Year}\n");
-        Console.WriteLine("\t\tTHANK YOU!\n");
+        Console.WriteLine($"CHANGE\t\t\t{(Math.Ceiling(subtotal + (subtotal * TaxRate))) - (subtotal + (subtotal * TaxRate)):$#,##0.00}\n");
+        Console.WriteLine($"\t\t# ITEMS SOLD {user.Cart.Count}");
+        Console.WriteLine($"\t\t{DateTime.Now.Month}/{DateTime.Now.Day}/{DateTime.Now.Year}");
+        Console.WriteLine("\n\t\tTHANK YOU!\n");
         Console.WriteLine("\t\tGlad to see you again!");
         Console.WriteLine("==================================================");
 
@@ -187,10 +199,10 @@ public class Store {
         writer.WriteLine($"TOTAL\t\t\t{(subtotal + (subtotal * TaxRate)):$#,##0.00}\n");
         writer.WriteLine($"CASH\t\t\t{Math.Ceiling(subtotal + (subtotal * TaxRate)):$#,##0.00}");
         writer.WriteLine($"CHANGE\t\t\t{(Math.Ceiling(subtotal + (subtotal * TaxRate))) - (subtotal + (subtotal * TaxRate)):$#,##0.00}\n");
-        writer.WriteLine($"\t# ITEMS SOLD {user.Cart.Count}");
-        writer.WriteLine($"\t{DateTime.Now.Month}/{DateTime.Now.Day}/{DateTime.Now.Year}   {DateTime.Now.ToUniversalTime()}");
+        writer.WriteLine($"\t\t# ITEMS SOLD {user.Cart.Count}");
+        writer.WriteLine($"\t\t{DateTime.Now.Month}/{DateTime.Now.Day}/{DateTime.Now.Year}   {DateTime.Now.ToUniversalTime()}");
         writer.WriteLine("\n\t\tThank You!\n");
-        writer.WriteLine("Glad to see you again!");
+        writer.WriteLine("\t\tGlad to see you again!");
         writer.WriteLine("==================================================");
 
         return false;
