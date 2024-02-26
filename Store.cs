@@ -107,6 +107,13 @@ public class Store {
      */
     public bool CheckOut(User user) {
         double cartTotal = 0;
+        foreach (var listItem in user.GroceryList) {
+            if (!(user.Cart.Contains(listItem))) {
+
+                Console.WriteLine("[!] You still have things on your grocery list to pick up!");
+            }
+        }
+
         foreach (var cartItem in user.Cart) {
             cartTotal += cartItem.Price * cartItem.Quantity + (cartItem.Price * cartItem.Quantity * TaxRate);
         }

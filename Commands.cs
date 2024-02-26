@@ -25,6 +25,7 @@ public static class Commands {
     /*  Internal function used to handle user input arguments
     */
     private static bool Command(string[] arguments, User user, Store store) {
+        ClearTerminal();
         switch (arguments[0]) {
             case "set":
             try {
@@ -98,7 +99,7 @@ public static class Commands {
             case "exit":
             return false;
 
-            case $"admin123":
+            case "admin123":
             if (user.Admin) {
                 Console.WriteLine("ADMINISTRATOR MODE: DISABLED");
                 user.Admin = false;
@@ -250,50 +251,33 @@ public static class Commands {
         while (toggle) {
             Console.WriteLine("\nPlease enter an ingredient name and amount ({item name} {amount})");
             Console.WriteLine("When you are finished adding ingredients, type 'done'.");
-            Console.WriteLine("\t- 'look' and 'search {item name}' can still be used");
+            Console.WriteLine(" - 'look' and 'search {item name}' can still be used");
             Console.WriteLine("__________________________________________________");
             Console.Write(">> ");
             string command = Console.ReadLine();
             string[] arguments = command.Split(" ");
 
-            if (arguments.Length > 1) {
+            if (arguments[0] == "search") {
+                ClearTerminal();
                 try {
                     int count = 0;
                     foreach (var item in store.Inventory) {
                         if (arguments[1].Replace("_", " ").ToLower() == item.Category.ToLower()) {
-                            ClearTerminal();
-                            store.SearchStore(arguments[1], true);
-                            return;
+                            count++;
                         }
                     }
 
                     if (count == 0) {
-                        ClearTerminal();
                         store.SearchStore(arguments[1], false);
+                    } else {
+                        store.SearchStore(arguments[1], true);
                     }
                 } catch {
-                    ClearTerminal();
                     Console.WriteLine("[!] Invalid syntax! (search {item name})");
                 }
             } else if (arguments[0] == "look") {
                 ClearTerminal();
                 store.ViewStore();
-            } else if (arguments[0] == "search" /* NEEDS FIXING */) {
-                try {
-                    int count = 0;
-                    foreach (var item in store.Inventory) {
-                        if (arguments[1].Replace("_", " ").ToLower() == item.Category.ToLower()) {
-                            store.SearchStore(arguments[1], true);
-                            return;
-                        }
-                    }
-
-                    if (count == 0) {
-                        store.SearchStore(arguments[1], false);
-                    }
-                } catch {
-                    Console.WriteLine("[!] Invalid syntax! (search {item name})");
-                }
             } else if (arguments[0] == "done") {
                 ClearTerminal();
                 Recipe recipe = new(name, ingredients);
@@ -301,8 +285,40 @@ public static class Commands {
                 Console.WriteLine($"'{recipe.RecipeName}' recipe has been created successfully!\n");
                 Console.WriteLine(recipe);
                 return;
-            } 
-            else {
+            } else if (arguments.Length > 1) {
+                try {
+                    int storeItemCount = 0;
+                    foreach (var storeItem in store.Inventory) {
+                        if (arguments[0].Replace("_", " ").ToLower() == storeItem.Name.ToLower() && int.Parse(arguments[1]) > 0) {        
+                            int ingredientCount = 0;
+                            storeItemCount++;
+                            foreach (var ingredient in ingredients) {
+                                if (arguments[0].Replace("_", " ").ToLower() == ingredient.Name.ToLower()) {
+                                    ingredient.Quantity += int.Parse(arguments[1]);
+                                    ClearTerminal();
+                                    Console.WriteLine($"Added {arguments[1]} {ingredient.Name} to the '{name}' recipe successfully! ({ingredient.Quantity} in recipe)");
+                                    ingredientCount++;
+                                }
+                            }
+
+                            if (ingredientCount == 0) {
+                                Item newIngredient = new(storeItem.Name, int.Parse(arguments[1]), storeItem.Category, storeItem.Price, storeItem.Calories);
+                                ingredients.Add(newIngredient);
+                                ClearTerminal();
+                                Console.WriteLine($"Added {newIngredient.Quantity} {newIngredient.Name} to the '{name}' recipe successfully!");
+                            }
+                        }
+                    }
+
+                    if (storeItemCount == 0) {
+                        ClearTerminal();
+                        Console.WriteLine($"[!] Ingredient '{arguments[0]}' does not exist!");
+                    }
+                } catch {
+                    ClearTerminal();
+                    Console.WriteLine("[!] Invalid syntax! ({item name} {quantity})");
+                }
+            } else {
                 ClearTerminal();
                 Console.WriteLine("[!] Invalid syntax! ({item name} {quantity})");
             }
