@@ -11,7 +11,7 @@ Commands ({}: Required Arguments, []: Optional Args):
   - list [add/remove {item name}] = Print, add, and remove items from your grocery list
   - cart [add/remove {item name}] = Print, add, and remove items from your cart
   - recipe {create/remove} = Create/remove recipes in your recipe list
-  - reicpes = Prints out recipes in your recipe list
+  - recipes = Prints out recipes in your recipe list
   - look = Lists all the items that are currently in the store
   - search {string} = Searches store inventory for items that contain item name
   - balance = Prints out information about your balance
