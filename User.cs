@@ -3,12 +3,8 @@ using System.Collections.Generic;
 
 public class User {
     private string name; // Name of the user
-    private bool admin; // Boolean value if user is an admin
     private int age; // Age of the user
     private double userBalance; // Balance of the user
-    private List<Item> cart; // Empty list that stores food items from the store inventory list
-    private List<Item> groceryList; // Empty list that stores food item references to be collected at the store
-    private List<Recipe> recipeList; // Empty list that stores the user's personal recipes
 
     public User(string name, int age, double userBalance, List<Item> cart, bool admin, List<Item> groceryList, List<Recipe> recipeList) {
         Name = name;
@@ -160,20 +156,20 @@ public class User {
         bool listItemExists = false;
 
         foreach (var listItem in GroceryList) {
-            if (itemName.ToLower().Replace("_", " ").ToLower() == listItem.Name.ToLower()) {
+            if (itemName.Replace("_", " ").Equals(listItem.Name, StringComparison.CurrentCultureIgnoreCase)) {
                 listItemExists = true;
-                if (amount >= listItem.Quantity) {
+                if (amount > listItem.Quantity) {
                     GroceryList.Remove(listItem);
+                    Console.WriteLine($"You only had {listItem.Quantity} '{listItem.Name}' on your list...");
+                    Console.WriteLine($"'{listItem.Name}' was removed from your grocery list!");
                 } else {
                     listItem.Quantity -= amount;
                 }
-                
-                Console.WriteLine($"{amount} {listItem.Name} was removed to your grocery list!");
             }
         }
 
         if (!listItemExists) {
-            Console.WriteLine($"[!] This store does not have any '{itemName.Replace("_", " ")}'!");
+            Console.WriteLine($"[!] Your grocery list does not have any '{itemName.Replace("_", " ")}'!");
         }
 
         return;
@@ -185,7 +181,7 @@ public class User {
         bool storeItemExists = false;
 
         foreach (var storeItem in store.Inventory) {
-            if (itemName.ToLower().Replace("_", " ").ToLower() == storeItem.Name.ToLower() && storeItem.Quantity > 0) {
+            if (itemName.ToLower().Replace("_", " ").Equals(storeItem.Name, StringComparison.CurrentCultureIgnoreCase) && storeItem.Quantity > 0) {
                 storeItemExists = true;
                 if (Age < 21 && storeItem.Category == "Alcohol") {
                     Console.WriteLine("[!] This store does not sell alcohol to people younger than 21!");
@@ -278,14 +274,12 @@ public class User {
     public int Age {
         get => age;
         set {
-            // Set the age to '0' if the input is not an integer
             if (value.GetType() != typeof(int)) {
                 Console.WriteLine("[!] Invalid age! Age was set to '18' instead.");
                 age = 18;
-                // Set the age to '0' if the input is less than 0
             } else if (value < 0) {
                 Console.WriteLine("[!] The age can't be less than 0! Age was set to '18' instead.");
-                age = 0;
+                age = 18;
             }
 
             age = value;
@@ -307,28 +301,8 @@ public class User {
             userBalance = value;
         }
     }
-    public List<Item> Cart {
-        get => cart;
-        set {
-            cart = value;
-        }
-    }
-    public List<Item> GroceryList {
-        get => groceryList;
-        set {
-            groceryList = value;
-        }
-    }
-    public List<Recipe> RecipeList {
-        get => recipeList;
-        set {
-            recipeList = value;
-        }
-    }
-    public bool Admin {
-        get => admin;
-        set {
-            admin = value;
-        }
-    }
+    public List<Item> Cart { get; set; }
+    public List<Item> GroceryList { get; set; }
+    public List<Recipe> RecipeList { get; set; }
+    public bool Admin { get; set; }
 }

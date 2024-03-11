@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 public class Recipe {
     private string recipeName;
-    private List<Item> recipeIngredients;
     
     public Recipe(string recipeName, List<Item> ingredients) {
         RecipeName = recipeName;
@@ -36,10 +35,5 @@ public class Recipe {
             recipeName = value;
         }
     }
-    public List<Item> RecipeIngredients {
-        get => recipeIngredients;
-        set {
-            recipeIngredients = value;
-        }
-    }
+    public List<Item> RecipeIngredients { get; set; }
 }

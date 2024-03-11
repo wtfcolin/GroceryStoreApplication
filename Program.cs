@@ -4,7 +4,8 @@ using System.IO;
 using static Commands;
 
 public class Program {
-    // Function that gets the line count of a file located in path
+    /* Function that gets the line count of a file located in path
+    */
     private static int GetLineCount(string path) {
         if (!File.Exists(path)) {
             Console.WriteLine($"[!] Count not read file '{path}'!");
@@ -20,7 +21,9 @@ public class Program {
 
         return count;
     }
-    // Function that loads a store from 'Store.csv'
+    
+    /* Function that loads a store from 'Store.csv'
+    */
     private static Store LoadStore(string path) {
         try {
             using StreamReader reader = new StreamReader(path);
@@ -57,17 +60,19 @@ public class Program {
             return store;
         }
     }
-    // Main function
+    
+    /* Main function
+    */
     private static void Main() {
         bool RUNNING = true; // Status of the program. Once it toggles false the program ends.
         string path = "Store.csv"; // Path to the file that contains 'Food' object properties in a CSV format.
 
-        List<Item> cart = new();
-        List<Item> groceryList = new();
-        List<Recipe> recipeList = new();
+        List<Item> cart = [];
+        List<Item> groceryList = [];
+        List<Recipe> recipeList = [];
 
         // Prompt the user before the program starts to enter personal information
-        /*
+        
         ClearTerminal();
         Console.WriteLine("What is your name?");
         Console.Write(">> ");
@@ -78,10 +83,8 @@ public class Program {
         Console.WriteLine("How much money do you want? (0.00 format)");
         Console.Write(">> ");
         double balance = double.Parse(Console.ReadLine());
-        User user = new User(name, age, balance, cart, false, groceryList);
-        */
+        User user = new(name, age, balance, cart, false, groceryList, recipeList);
 
-        User user = new("Colin", 22, 1000.0, cart, false, groceryList, recipeList);
         Store store = LoadStore(path);
 
         ClearTerminal();

@@ -18,9 +18,7 @@ public class Item {
     /*  Override function that shows information about the item
      */
     public override string ToString() {
-        if (Name.Length > 16) {
-            return $"- {Name} ({Quantity})\t\t\t|\t Price: {Price:$#,##0.00}\t|\tCategory: {Category}\t|\tCalories: {Calories}";
-        } else if (Name.Length > 8) {
+        if (Name.Length > 8) {
             return $"- {Name} ({Quantity})\t\t\t|\t Price: {Price:$#,##0.00}\t|\tCategory: {Category}\t|\tCalories: {Calories}";
         } else {
             return $"- {Name} ({Quantity})\t|\t Price: {Price:$#,##0.00}\t|\tCategory: {Category}\t|\tCalories: {Calories}";
@@ -32,7 +30,6 @@ public class Item {
     public string Name {
         get => name;
         set {
-            // Set name to NONE if the input is empty/null.
             if (string.IsNullOrWhiteSpace(value)) {
                 Console.WriteLine("[!] Invalid Name! Name was set to 'PLACEHOLDER' instead.");
                 name = "NONE";
@@ -44,11 +41,9 @@ public class Item {
     public int Quantity {
         get => quantity;
         set {
-            // Set quantity to 0 if the input is not an integer
             if (value.GetType() != typeof(int)) {
                 Console.WriteLine("[!] Invalid Quantity! Quantity was set to '0' instead.");
                 quantity = 0;
-                // Set quantity to 0 if the input is less than 0
             } else if (value < 0) {
                 Console.WriteLine("[!] There can't be less than 0 items! Quantity was set to '0' instead.");
                 quantity = 0;
@@ -60,7 +55,6 @@ public class Item {
     public string Category {
         get => category;
         set {
-            // Set the category to NONE if the input is empty/null
             if (string.IsNullOrWhiteSpace(value)) {
                 Console.WriteLine("[!] Invalid Category! Category was set to 'NONE' instead.");
                 category = "NONE";
@@ -72,11 +66,9 @@ public class Item {
     public double Price {
         get => price;
         set {
-            // Set the price to 0 if the input is not a double
             if (value.GetType() != typeof(double)) {
                 Console.WriteLine("[!] Invalid Price! Price was set to '0.0' instead.");
                 price = 0.0;
-                // Set the price to 0 if the input is less than 0
             } else if (value < 0.0) {
                 Console.WriteLine("[!] The price can't be less than $0! Price was set to '0.0' instead.");
                 price = 0.0;
@@ -88,7 +80,6 @@ public class Item {
     public int Calories {
         get => calories;
         set {
-            // Set the calories to 0 if the input is not an integer
             if (value.GetType() != typeof(int)) {
                 Console.WriteLine("[!] Invalid Calories! Calories was set to '0' instead.");
                 calories = 0;

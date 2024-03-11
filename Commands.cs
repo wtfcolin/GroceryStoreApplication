@@ -83,20 +83,22 @@ public static class Commands {
             return true;
 
             case "list":
-            if (arguments.Length > 1) {
+            if (arguments.Length > 1 && arguments.Length < 5) {
                 try {
                     if (arguments[1] == "add") {
                         user.AddListItem(arguments[2], int.Parse(arguments[3]), store);
                     } else if (arguments[1] == "remove") {
                         user.RemoveListItem(arguments[2], int.Parse(arguments[3]));
                     } else {
-                        Console.WriteLine("[!] Invalid syntax! (cart [add/remove {item name} {amount}])");
+                        Console.WriteLine("[!] Invalid syntax! (list [add/remove {item name} {amount}])");
                     }
                 } catch {
-                    Console.WriteLine("[!] Invalid syntax! (cart [add/remove {item name} {amount}])");
+                    //Console.WriteLine("[!] Invalid syntax! (list [add/remove {item name} {amount}])");
                 }
-            } else {
+            } else if (arguments.Length == 1) {
                 user.ViewList();
+            } else {
+                Console.WriteLine("[!] Invalid syntax! (list [add/remove {item name} {amount}])");
             }
             return true;
 
@@ -233,17 +235,21 @@ public static class Commands {
                         Console.WriteLine($"The store balance was updated from '{store.StoreBalance:$#,##0.00}' to '{double.Parse(value):$#,##0.00}'!");
                         store.StoreBalance = double.Parse(value);
                     } else {
+                        ClearTerminal();
                         Console.WriteLine($"[!] Invalid store balance! Store balance must be between 1 - {MAXSTOREBALANCE}.");
                         return;
                     }
                 } catch {
+                    ClearTerminal();
                     Console.WriteLine("[!] Invalid store balance! Store balance must be a double.");
                 }
             } else {
+                ClearTerminal();
                 Console.WriteLine("[!] Invalid option! Please provide a valid option.");
                 return;
             }
         } else {
+            ClearTerminal();
             Console.WriteLine("[!] You do not have proper permissions to access this command!");
             return;
         }
@@ -275,7 +281,7 @@ public static class Commands {
                 try {
                     int count = 0;
                     foreach (var item in store.Inventory) {
-                        if (arguments[1].Replace("_", " ").ToLower() == item.Category.ToLower()) {
+                        if (arguments[1].Replace("_", " ").Equals(item.Category, StringComparison.CurrentCultureIgnoreCase)) {
                             count++;
                         }
                     }
@@ -305,11 +311,11 @@ public static class Commands {
                 try {
                     int storeItemCount = 0;
                     foreach (var storeItem in store.Inventory) {
-                        if (arguments[0].Replace("_", " ").ToLower() == storeItem.Name.ToLower() && int.Parse(arguments[1]) > 0) {        
+                        if (arguments[0].Replace("_", " ").Equals(storeItem.Name, StringComparison.CurrentCultureIgnoreCase) && int.Parse(arguments[1]) > 0) {        
                             int ingredientCount = 0;
                             storeItemCount++;
                             foreach (var ingredient in ingredients) {
-                                if (arguments[0].Replace("_", " ").ToLower() == ingredient.Name.ToLower()) {
+                                if (arguments[0].Replace("_", " ").Equals(ingredient.Name, StringComparison.CurrentCultureIgnoreCase)) {
                                     ingredient.Quantity += int.Parse(arguments[1]);
                                     ClearTerminal();
                                     Console.WriteLine($"Added {arguments[1]} {ingredient.Name} to the '{name}' recipe successfully! ({ingredient.Quantity} in recipe)");
@@ -357,9 +363,7 @@ public static class Commands {
                     ClearTerminal();
                     Console.WriteLine($"Recipe '{recipe.RecipeName}' has been removed successfully!");
                     foreach (var ingredient in recipe.RecipeIngredients) {
-                        if (user.GroceryList.Contains(ingredient)) {
-                            user.GroceryList.Remove(ingredient);
-                        }
+                        user.GroceryList.Remove(ingredient);
                     }
                     return;
                 }
