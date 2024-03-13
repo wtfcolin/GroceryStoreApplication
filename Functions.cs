@@ -85,7 +85,7 @@ public static class Functions {
             case "list":
             if (arguments.Length == 4) {
                 try {
-                    if (int.Parse(arguments[3]) < 0) {
+                    if (int.Parse(arguments[3]) > 0) {
                         if (arguments[1] == "add") {
                             user.AddListItem(arguments[2], int.Parse(arguments[3]), store);
                         } else if (arguments[1] == "remove") {

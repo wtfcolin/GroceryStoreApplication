@@ -67,7 +67,7 @@ public class Program {
     */
     private static void Main() {
         bool RUNNING = true; // Status of the program. Once it toggles false the program ends.
-        string path = "Store.csv"; // Path to the file that contains 'Food' object properties in a CSV format.
+        string path = "Store.csv"; // Path to the file that contains 'Item' object properties in a CSV format.
 
         List<Item> cart = [];
         List<Item> groceryList = [];
@@ -85,7 +85,7 @@ public class Program {
             Console.WriteLine("\nHow old are you?");
             Console.Write(">> ");
             age = int.Parse(Console.ReadLine());
-            Console.WriteLine("\nHow much money do you want? (0.00 format)");
+            Console.WriteLine("\nHow much money do you want?");
             Console.Write(">> ");
             balance = double.Parse(Console.ReadLine());
         } catch {
