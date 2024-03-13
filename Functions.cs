@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 
-public static class Commands {
+public static class Functions {
     /*  Function to handle user input
     */
     public static bool CommandLine(User user, Store store) {
         Console.WriteLine("\n__________________________________________________");
         Console.Write(">> ");
-        string command = Console.ReadLine(); // Get the user input
-        string[] arguments = command.Split(' '); // Split the input by spaces to get the arguments
+        string command = Console.ReadLine();
+        string[] arguments = command.Split(' ');
         ClearTerminal();
         return Command(arguments, user, store);
     }
@@ -68,7 +68,7 @@ public static class Commands {
             try {
                 int count = 0;
                 foreach (var item in store.Inventory) {
-                    if (arguments[1].Replace("_", " ").ToLower() == item.Category.ToLower()) {
+                    if (arguments[1].Replace("_", " ").Equals(item.Category, StringComparison.CurrentCultureIgnoreCase)) {
                         store.SearchStore(arguments[1], true);
                         return true;
                     }
@@ -83,17 +83,21 @@ public static class Commands {
             return true;
 
             case "list":
-            if (arguments.Length > 1 && arguments.Length < 5) {
+            if (arguments.Length == 4) {
                 try {
-                    if (arguments[1] == "add") {
-                        user.AddListItem(arguments[2], int.Parse(arguments[3]), store);
-                    } else if (arguments[1] == "remove") {
-                        user.RemoveListItem(arguments[2], int.Parse(arguments[3]));
+                    if (int.Parse(arguments[3]) < 0) {
+                        if (arguments[1] == "add") {
+                            user.AddListItem(arguments[2], int.Parse(arguments[3]), store);
+                        } else if (arguments[1] == "remove") {
+                            user.RemoveListItem(arguments[2], int.Parse(arguments[3]));
+                        } else {
+                            Console.WriteLine("[!] Invalid syntax! (list [add/remove {item name} {amount}])");
+                        }
                     } else {
-                        Console.WriteLine("[!] Invalid syntax! (list [add/remove {item name} {amount}])");
+                        Console.WriteLine("[!] Invalid amount! Item amount must be greater than 0!");
                     }
                 } catch {
-                    //Console.WriteLine("[!] Invalid syntax! (list [add/remove {item name} {amount}])");
+                    Console.WriteLine("[!] Invalid syntax! (list [add/remove {item name} {amount}])");
                 }
             } else if (arguments.Length == 1) {
                 user.ViewList();
@@ -147,7 +151,7 @@ public static class Commands {
             return true;
 
             case "home":
-            store.Greeting(user.Name, user.UserBalance, user.Age, user.Cart);
+            store.Greeting(user.Name, user.Balance, user.Age, user.Cart);
             return true;
 
             default:
@@ -163,6 +167,7 @@ public static class Commands {
         Console.WriteLine("\t{}: Required Args, []: Optional Args\n");
 
         Console.WriteLine("- help = Displays a list of commands");
+        Console.WriteLine("- home = Displays the home page");
         Console.WriteLine("- exit = Exits the program\n");
 
         Console.WriteLine("- list [add/remove {item name}] = Print, add, and remove items from your grocery list");
@@ -219,8 +224,8 @@ public static class Commands {
                 const double MAXUSERBALANCE = 1000000.0;
                 try {
                     if (double.Parse(value) >= 1 && double.Parse(value) <= MAXUSERBALANCE) {
-                        Console.WriteLine($"Your balance was updated from '{user.UserBalance:$#,##0.00}' to '{double.Parse(value):$#,##0.00}'!");
-                        user.UserBalance = double.Parse(value);
+                        Console.WriteLine($"Your balance was updated from '{user.Balance:$#,##0.00}' to '{double.Parse(value):$#,##0.00}'!");
+                        user.Balance = double.Parse(value);
                     } else {
                         Console.WriteLine($"[!] Invalid balance! Balance must be between 1 - {MAXUSERBALANCE}.");
                         return;
@@ -232,8 +237,8 @@ public static class Commands {
                 const double MAXSTOREBALANCE = 100000000.0;
                 try {
                     if (double.Parse(value) >= 1 && double.Parse(value) <= MAXSTOREBALANCE) {
-                        Console.WriteLine($"The store balance was updated from '{store.StoreBalance:$#,##0.00}' to '{double.Parse(value):$#,##0.00}'!");
-                        store.StoreBalance = double.Parse(value);
+                        Console.WriteLine($"The store balance was updated from '{store.Balance:$#,##0.00}' to '{double.Parse(value):$#,##0.00}'!");
+                        store.Balance = double.Parse(value);
                     } else {
                         ClearTerminal();
                         Console.WriteLine($"[!] Invalid store balance! Store balance must be between 1 - {MAXSTOREBALANCE}.");
@@ -258,7 +263,7 @@ public static class Commands {
     /*  Creates a recipe for the user and appends it to their personal recipe list
     */
     public static void CreateRecipe(Store store, User user, bool toggle) {
-        List<Item> ingredients = new();
+        List<Item> ingredients = [];
 
         ClearTerminal();
         Console.WriteLine("What is the name of your recipe?");
@@ -301,9 +306,9 @@ public static class Commands {
                 ClearTerminal();
                 Recipe recipe = new(name, ingredients);
                 user.RecipeList.Add(recipe);
-                Console.WriteLine($"'{recipe.RecipeName}' recipe has been created successfully!\n");
+                Console.WriteLine($"'{recipe.Name}' recipe has been created successfully!\n");
                 Console.WriteLine(recipe);
-                foreach (var ingredient in recipe.RecipeIngredients) {
+                foreach (var ingredient in recipe.Ingredients) {
                     user.GroceryList.Add(ingredient);
                 }
                 return;
@@ -358,11 +363,11 @@ public static class Commands {
 
         foreach (var recipe in user.RecipeList) {
             try {
-                if (name == recipe.RecipeName) {
+                if (name == recipe.Name) {
                     user.RecipeList.Remove(recipe);
                     ClearTerminal();
-                    Console.WriteLine($"Recipe '{recipe.RecipeName}' has been removed successfully!");
-                    foreach (var ingredient in recipe.RecipeIngredients) {
+                    Console.WriteLine($"Recipe '{recipe.Name}' has been removed successfully!");
+                    foreach (var ingredient in recipe.Ingredients) {
                         user.GroceryList.Remove(ingredient);
                     }
                     return;

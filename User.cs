@@ -4,12 +4,12 @@ using System.Collections.Generic;
 public class User {
     private string name; // Name of the user
     private int age; // Age of the user
-    private double userBalance; // Balance of the user
+    private double balance; // Balance of the user
 
-    public User(string name, int age, double userBalance, List<Item> cart, bool admin, List<Item> groceryList, List<Recipe> recipeList) {
+    public User(string name, int age, double balance, List<Item> cart, bool admin, List<Item> groceryList, List<Recipe> recipeList) {
         Name = name;
         Age = age;
-        UserBalance = userBalance;
+        Balance = balance;
         Cart = cart;
         Admin = admin;
         GroceryList = groceryList;
@@ -19,14 +19,14 @@ public class User {
     /* Override function that displays information about the user (can be seen using 'me' command)
      */
     public override string ToString() {
-        return $"===============[ Your Information ]===============\nAge:\t\t{Age}\nBalance:\t{UserBalance:$#,##0.00}\nAdmin:\t\t{Admin}\n==================================================";
+        return $"===============[ Your Information ]===============\nAge:\t\t{Age}\nBalance:\t{Balance:$#,##0.00}\nAdmin:\t\t{Admin}\n==================================================";
     }
 
     /* Function that allows the user to view their current balance subtracted by the current items in their cart
      */
     public void ViewBalance(double taxRate) {
         Console.WriteLine("=================[ Your Balance ]=================");
-        Console.WriteLine($"Current Balance:\t{UserBalance:$#,##0.00}");
+        Console.WriteLine($"Current Balance:\t{Balance:$#,##0.00}");
 
         double subtotal = 0.00;
         foreach (var item in Cart) {
@@ -40,7 +40,7 @@ public class User {
         Console.WriteLine($"Tax:\t\t\t{tax:$#,##0.00}");
         Console.WriteLine($"\t\t      + __________");
         Console.WriteLine($"Current Total:\t\t{newBalance:$#,##0.00}");
-        Console.WriteLine($"\nNew Balance:\t\t{UserBalance - newBalance:$#,##0.00} (-{newBalance:$#,##0.00})");
+        Console.WriteLine($"\nNew Balance:\t\t{Balance - newBalance:$#,##0.00} (-{newBalance:$#,##0.00})");
         Console.WriteLine("==================================================");
     }
 
@@ -73,13 +73,13 @@ public class User {
         } else {
             int totalCalories = 0;
             foreach (var recipe in RecipeList) {
-                Console.WriteLine($"\n---[ {recipe.RecipeName} ]---");
-                foreach (var ingredient in recipe.RecipeIngredients) {
+                Console.WriteLine($"\n---[ {recipe.Name} ]---");
+                foreach (var ingredient in recipe.Ingredients) {
                     totalCalories += ingredient.Calories * ingredient.Quantity;
                 }
 
                 Console.WriteLine($"Calories: {totalCalories}");
-                foreach (var ingredient in recipe.RecipeIngredients) {
+                foreach (var ingredient in recipe.Ingredients) {
                     Console.WriteLine($"* {ingredient.Quantity} {ingredient.Name}");
                 }
             }
@@ -123,11 +123,11 @@ public class User {
         bool storeItemExists = false;
 
         foreach (var storeItem in store.Inventory) {
-            if (itemName.Replace("_", " ").ToLower() == storeItem.Name.ToLower()) {
+            if (itemName.Replace("_", " ").Equals(storeItem.Name, StringComparison.CurrentCultureIgnoreCase)) {
                 storeItemExists = true;
                 bool listItemExists = false;
                 foreach (var listItem in GroceryList) {
-                    if (itemName.Replace("_", " ").ToLower() == listItem.Name.ToLower()) {
+                    if (itemName.Replace("_", " ").Equals(listItem.Name, StringComparison.CurrentCultureIgnoreCase)) {
                         listItemExists = true;
                         listItem.Quantity += amount;
                         break;
@@ -285,20 +285,18 @@ public class User {
             age = value;
         }
     }
-    public double UserBalance {
-        get => userBalance;
+    public double Balance {
+        get => balance;
         set {
-            // Set the balance to '0' if the input is not a double
             if (value.GetType() != typeof(double)) {
                 Console.WriteLine("[!] Invalid balance! Balance was set to '0' instead.");
-                userBalance = 0;
-                // Set the balance to '0' if the input is less than 0
+                balance = 0;
             } else if (value < 0) {
                 Console.WriteLine("[!] The balance can't be less than $0! Balance was set to '0.0' instead.");
-                userBalance = 0;
+                balance = 0;
             }
 
-            userBalance = value;
+            balance = value;
         }
     }
     public List<Item> Cart { get; set; }

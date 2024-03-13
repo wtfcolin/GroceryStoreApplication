@@ -2,38 +2,37 @@
 using System.Collections.Generic;
 
 public class Recipe {
-    private string recipeName;
+    private string name;
     
-    public Recipe(string recipeName, List<Item> ingredients) {
-        RecipeName = recipeName;
-        RecipeIngredients = ingredients;
+    public Recipe(string name, List<Item> ingredients) {
+        Name = name;
+        Ingredients = ingredients;
     }
 
     public override string ToString() {
         string ingredientsList = "";
         int totalCalories = 0;
 
-        foreach (Item ingredient in RecipeIngredients) {
+        foreach (Item ingredient in Ingredients) {
             ingredientsList += $"\t\t* {ingredient.Quantity} {ingredient.Name}\n";
             totalCalories += ingredient.Calories * ingredient.Quantity;
         }
 
-        return $"==============[ Recipe Information ]==============\nName:\t\t{RecipeName}\nCalories:\t{totalCalories}\nIngredients:\n{ingredientsList}\n==================================================";
+        return $"==============[ Recipe Information ]==============\nName:\t\t{Name}\nCalories:\t{totalCalories}\nIngredients:\n{ingredientsList}\n==================================================";
     }
 
     /*  Recipe properties
      */
-    public string RecipeName {
-        get => recipeName;
+    public string Name {
+        get => name;
         set {
-            // Set the name to 'NONE' if the input is empty/null
             if (string.IsNullOrWhiteSpace(value)) {
                 Console.WriteLine("[!] Invalid name! Name was set to 'NONE'.");
-                recipeName = "NONE";
+                name = "NONE";
             }
 
-            recipeName = value;
+            name = value;
         }
     }
-    public List<Item> RecipeIngredients { get; set; }
+    public List<Item> Ingredients { get; set; }
 }

@@ -3,26 +3,23 @@ using System.Collections.Generic;
 using System.IO;
 
 public class Store {
-    private int storeID; // ID of the store
-    private string storeName; // Name of the store
-    private string storeAddress; // Address of the store
-    private double storeBalance; // Balance of the store
-    private double taxRate; // Tax rate for checkout functions and pricing calculations
-    private readonly List<Item> inventory; // Inventory for the stores with 'Item' objects
+    private string name; // Name of the store
+    private string address; // Address of the store
+    private double balance; // Balance of the store
  
-    public Store(int storeID, string storeName, string storeAddress, double storeBalance, double taxRate, List<Item> inventory) {
-        StoreID = storeID;
-        StoreName = storeName;
-        StoreAddress = storeAddress;
-        StoreBalance = storeBalance;
+    public Store(int id, string name, string address, double balance, double taxRate, List<Item> inventory) {
+        ID = id;
+        Name = name;
+        Address = address;
+        Balance = balance;
         TaxRate = taxRate;
-        this.inventory = inventory;
+        Inventory = inventory;
     }
 
     /* Override function that displays information about the store (can be seen with 'store' command)
      */
     public override string ToString() {
-        return $"==============[ Store Information ]===============\nName:\t\t{StoreName}\nBalance:\t{StoreBalance:$#,##0.00}\n==================================================";
+        return $"==============[ Store Information ]===============\nName:\t\t{Name}\nBalance:\t{Balance:$#,##0.00}\n==================================================";
     }
 
     /*  Function that allows the user to view the store's inventory (can be seen with 'look' command)
@@ -87,7 +84,7 @@ public class Store {
      */
     public void Greeting(string userName, double userBalance, int userAge, List<Item> Cart) {
         Console.WriteLine("=========[ Grocery Shopping Application ]=========\n");
-        Console.WriteLine($"\tYou are shopping at...  {StoreName}\n");
+        Console.WriteLine($"\tYou are shopping at...  {name}\n");
 
         double subtotal = 0.0;
         foreach (var cartItem in Cart) {
@@ -128,7 +125,7 @@ public class Store {
         }
         
         // Check if the user has enough money
-        if (user.UserBalance - cartTotal < 0) {
+        if (user.Balance - cartTotal < 0) {
             Console.WriteLine("[!] Invalid balance! You do not have enough money to checkout!");
             return true;
         }
@@ -140,11 +137,11 @@ public class Store {
         string path = $"reciept-{recieptID}.txt";
         using StreamWriter writer = new(path);
 
-        Console.WriteLine($"===========[ Reciept For {storeName} ]============");
-        Console.WriteLine($"\t{StoreName.ToUpper()}");
-        Console.WriteLine($"\tSTORE ID # {StoreID}");
+        Console.WriteLine($"===========[ Reciept For {Name} ]============");
+        Console.WriteLine($"\t{Name.ToUpper()}");
+        Console.WriteLine($"\tSTORE ID # {ID}");
         Console.WriteLine($"\tRECIEPT ID # {recieptID}");
-        Console.WriteLine($"\t{StoreAddress.ToUpper()}");
+        Console.WriteLine($"\t{Address.ToUpper()}");
         Console.WriteLine($"\tTEL: +{randomNumber.Next(1000)}-{randomNumber.Next(1000)}-{randomNumber.Next(10000)}");
         Console.WriteLine($"--------------------------------------------------");
         Console.WriteLine($"CASHIER:\t\t\t#{randomNumber.Next(10)}");
@@ -153,9 +150,9 @@ public class Store {
         Console.WriteLine($"NAME\t\t\tQTY\tPRICE\n");
         
         writer.WriteLine("===========[ Transaction Information ]============");
-        writer.WriteLine($"\t{StoreName.ToUpper()}");
-        writer.WriteLine($"\tSTORE ID # {StoreID}\n");
-        writer.WriteLine($"\t{StoreAddress.ToUpper()}");
+        writer.WriteLine($"\t{Name.ToUpper()}");
+        writer.WriteLine($"\tSTORE ID # {ID}\n");
+        writer.WriteLine($"\t{Address.ToUpper()}");
         writer.WriteLine($"\tTEL: +{randomNumber.Next(1000)}-{randomNumber.Next(1000)}-{randomNumber.Next(10000)}");
         writer.WriteLine($"--------------------------------------------------");
         writer.WriteLine($"CASHIER:\t\t\t#{randomNumber.Next(10)}");
@@ -178,8 +175,8 @@ public class Store {
         }
         Console.WriteLine(" ");
 
-        user.UserBalance -= (subtotal + (subtotal * TaxRate));
-        StoreBalance += (subtotal + (subtotal * TaxRate));
+        user.Balance -= (subtotal + (subtotal * TaxRate));
+        Balance += (subtotal + (subtotal * TaxRate));
 
         Console.WriteLine($"--------------------------------------------------\n");
         Console.WriteLine($"SUBTOTAL\t\t{subtotal:$#,##0.00}");
@@ -210,59 +207,45 @@ public class Store {
     
     /*  Store properties
      */
-    public int StoreID {
-        get => storeID;
-        set {
-            storeID = value;
-        }
-    }
-    public string StoreName {
-        get => storeName;
+    public int ID { get; set; }
+    public string Name {
+        get => name;
         set {
             // Set the store name to 'NONE' if the input is empty/null
             if (string.IsNullOrWhiteSpace(value)) {
                 Console.WriteLine("[!] Invalid store name! Store name was set to 'NONE' instead.");
-                storeName = "NONE";
+                name = "NONE";
             }
 
-            storeName = value;
+            name = value;
         }
     }
-    public string StoreAddress {
-        get => storeAddress;
+    public string Address {
+        get => address;
         set {
             // Set the store address to 'NONE' if the input is empty/null
             if (string.IsNullOrWhiteSpace(value)) {
                 Console.WriteLine("[!] Invalid store address! Store address was set to 'NONE' instead.");
-                storeAddress = "NONE";
+                address = "NONE";
             }
 
-            storeAddress = value;
+            address = value;
         }
     }
-    public double StoreBalance {
-        get => storeBalance;
+    public double Balance {
+        get => balance;
         set {
-            // Check for type: double
             if (value.GetType() != typeof(double)) {
                 Console.WriteLine("[!] Invalid balance! Balance was set to '0' instead.");
-                storeBalance = 0;
-                // Check for range: balance < 0
+                balance = 0;
             } else if (value < 0) {
                 Console.WriteLine("[!] The balance can't be less than $0! Balance was set to '0.0' instead.");
-                storeBalance = 0;
+                balance = 0;
             }
 
-            storeBalance = value;
+            balance = value;
         }
     }
-    public double TaxRate {
-        get => taxRate;
-        set {
-            taxRate = value;
-        }
-    }
-    public List<Item> Inventory {
-        get => inventory;
-    }
+    public double TaxRate { get; set; }
+    public List<Item> Inventory { get; }
 }
