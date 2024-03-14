@@ -37,7 +37,7 @@ public class Program {
             reader.ReadLine(); // Skip over the header
 
             int lineCount = GetLineCount(path);
-            List<Item> storeInventory = [];
+            List<Item> storeInventory = new();
             
             // For each of the lines past the store information, collect each part of information that creates the item and assigns them to a list
             for (int i = 5; i < lineCount; i++) {
@@ -58,7 +58,7 @@ public class Program {
         } catch {
             ClearTerminal();
             Console.WriteLine("[!] Loading items was unsuccessful, check the syntax of the CSV file!");
-            Store store = new(0, "NULL", "NULL", 0.0, 0.15, []);
+            Store store = new(0, "NULL", "NULL", 0.0, 0.15, new());
             return store;
         }
     }
@@ -69,9 +69,9 @@ public class Program {
         bool RUNNING = true; // Status of the program. Once it toggles false the program ends.
         string path = "Store.csv"; // Path to the file that contains 'Item' object properties in a CSV format.
 
-        List<Item> cart = [];
-        List<Item> groceryList = [];
-        List<Recipe> recipeList = [];
+        List<Item> cart = new();
+        List<Item> groceryList = new();
+        List<Recipe> recipeList = new();
         string name;
         int age;
         double balance;

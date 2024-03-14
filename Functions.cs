@@ -263,7 +263,7 @@ public static class Functions {
     /*  Creates a recipe for the user and appends it to their personal recipe list
     */
     public static void CreateRecipe(Store store, User user, bool toggle) {
-        List<Item> ingredients = [];
+        List<Item> ingredients = new();
 
         ClearTerminal();
         Console.WriteLine("What is the name of your recipe?");
